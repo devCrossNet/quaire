@@ -33,9 +33,9 @@ the view or the behaviour. This pattern provides a nice separation of:
 - zero dependencies
 - view independent
 - linear user-flow
-- branched user-flow
+- branched/merged user-flow
 - loops
-- validation
+- dependencies between questions and validation
 - re-storing state of the questionnaire from the selected answers
 - navigation
 

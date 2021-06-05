@@ -281,6 +281,7 @@ export class Quaire implements QuaireBase {
   ) {
     const question = this._getQuestionByNavigationItemId(navigationItem.id);
     const answer = this._getResultByValueProperty(question.resultProperty);
+    const active = activeNavigationItem.id === navigationItem.id;
     let hasValue = Boolean(answer);
     let value: any = null;
 
@@ -295,7 +296,7 @@ export class Quaire implements QuaireBase {
       name: navigationItem.name,
       value,
       icon: navigationItem.icon,
-      active: activeNavigationItem.id === navigationItem.id,
+      active,
       hasValue,
       subCategories: [],
       componentType: question.componentType,
@@ -341,7 +342,8 @@ export class Quaire implements QuaireBase {
       hasValue: active ? false : Boolean(answer),
       componentType: question.componentType,
     });
-    navigationItems[navigationItem.parentId].active = activeNavigationItem.parentId === navigationItem.parentId;
+    navigationItems[navigationItem.parentId].active =
+      navigationItems[navigationItem.parentId].active || activeNavigationItem.parentId === navigationItem.parentId;
     navigationItems[navigationItem.parentId].hasValue = true;
   }
 
