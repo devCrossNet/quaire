@@ -14,7 +14,7 @@ export interface QuaireBase {
 export interface QuaireOptions {
   items: Array<QuaireItem>;
   navigationItems?: Array<QuaireNavigationItem>;
-  quaireResult?: Record<string, any>;
+  result?: Record<string, any>;
 }
 
 export interface QuaireItemOption {
@@ -35,13 +35,13 @@ export interface QuaireInputItemOption extends Partial<QuaireItemOption> {
 
 export interface QuaireItem {
   id: number;
-  navigationItemId: number;
   question: string;
   description: string;
   required: boolean;
   resultProperty: string;
   dependsOnResultProperties: Array<string>;
   componentType: QuaireComponentType;
+  navigationItemId?: number;
   selectOptions?: Array<QuaireItemOption> | Record<string, Array<QuaireItemOption>>;
   rangeOption?: QuaireRangeItemOption;
   inputOption?: QuaireInputItemOption;

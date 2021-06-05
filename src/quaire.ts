@@ -23,12 +23,12 @@ export class Quaire implements QuaireBase {
   private readonly _rangeComponentTypes = [QuaireComponentType.RANGE_SLIDER];
   private readonly _inputComponentTypes = [QuaireComponentType.INPUT];
 
-  constructor({ items, navigationItems, quaireResult }: QuaireOptions) {
+  constructor({ items, navigationItems, result }: QuaireOptions) {
     this._items = items;
     this._navigationItems = navigationItems || [];
 
-    if (quaireResult) {
-      this._result = quaireResult;
+    if (result) {
+      this._result = result;
       this._setActiveItemId();
     }
 
