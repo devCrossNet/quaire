@@ -32,9 +32,9 @@ the view or the behaviour. This pattern provides a nice separation of:
 - framework-agnostic
 - zero dependencies
 - view independent
-- linear user-flow
-- branched/merged user-flow
-- loops
+- [linear user-flow](./examples/linear-flow)
+- [branched/merged user-flow](./examples/branched-and-merged-flow)
+- [loops](./examples/linear-flow-with-loop)
 - dependencies between questions and validation
 - re-storing state of the questionnaire from the selected answers
 - navigation
