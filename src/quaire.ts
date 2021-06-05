@@ -110,7 +110,7 @@ export class Quaire implements QuaireBase {
       selectOptions = item.selectOptions ? (item.selectOptions as Array<QuaireItemOption>) : null;
       rangeOption = item.rangeOption ? item.rangeOption : null;
       inputOption = item.inputOption ? item.inputOption : null;
-      defaultOption = item.defaultValues ? item.defaultValues : null;
+      defaultOption = item.defaultValue ? item.defaultValue : null;
     }
 
     return this._getQuestionObject(
@@ -124,7 +124,13 @@ export class Quaire implements QuaireBase {
   }
 
   private _getQuestionByNavigationItemId(categoryId: number): QuaireQuestion {
-    const item = this._items.find((i) => i.navigationItemId === categoryId);
+    let item = this._items
+      .filter((item) => hasAnswer(this._result[item.resultProperty]))
+      .find((i) => i.navigationItemId === categoryId);
+
+    if (!item) {
+      item = this._items.find((i) => i.navigationItemId === categoryId);
+    }
 
     return this._getQuestion(item.id);
   }
@@ -281,7 +287,7 @@ export class Quaire implements QuaireBase {
     if (answer === NO_VALUE) {
       value = `No value selected`;
     } else if (answer) {
-      value = this._getChildCategoryName(navigationItem, question, answer);
+      value = this._getChildCategoryValue(question, answer);
     }
 
     navigationItems[navigationItem.id] = {
@@ -296,20 +302,16 @@ export class Quaire implements QuaireBase {
     };
   }
 
-  private _getChildCategoryName(navigationItem: QuaireNavigationItem, question: QuaireQuestion, answer: any) {
-    let name: string;
+  private _getChildCategoryValue(question: QuaireQuestion, answer: any) {
+    let value: string;
 
     if (this._selectComponentTypes.includes(question.componentType)) {
-      name = question.selectOptions.find((selectOption) => selectOption.value === answer).label;
-    } else if (this._rangeComponentTypes.includes(question.componentType)) {
-      name = `${navigationItem.name}: ${answer.join('-')} ${question.rangeOption.unit}`;
-    } else if (this._inputComponentTypes.includes(question.componentType)) {
-      name = `${navigationItem.name}: ${answer} ${question.inputOption.unit}`;
+      value = question.selectOptions.find((selectOption) => selectOption.value === answer).label;
     } else {
-      name = navigationItem.name;
+      value = answer;
     }
 
-    return name;
+    return value;
   }
 
   private _addChildCategory(
@@ -326,7 +328,7 @@ export class Quaire implements QuaireBase {
     if (answer === NO_VALUE) {
       value = `No value selected`;
     } else if (answer) {
-      value = this._getChildCategoryName(navigationItem, question, answer);
+      value = this._getChildCategoryValue(question, answer);
     }
 
     navigationItems[navigationItem.parentId].subCategories.push({

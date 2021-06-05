@@ -30,6 +30,7 @@ the view or the behaviour. This pattern provides a nice separation of:
 
 # Features?
 - framework-agnostic
+- zero dependencies
 - view independent
 - linear user-flow
 - branched user-flow

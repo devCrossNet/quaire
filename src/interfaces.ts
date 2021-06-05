@@ -24,11 +24,11 @@ export interface QuaireItemOption {
   nextItemId?: number;
 }
 
-export interface QuaireRangeItemOption extends QuaireItemOption {
+export interface QuaireRangeItemOption extends Partial<QuaireItemOption> {
   range: Array<number>;
 }
 
-export interface QuaireInputItemOption extends QuaireItemOption {
+export interface QuaireInputItemOption extends Partial<QuaireItemOption> {
   type: string; // HTML input type e.g. text, number, date, etc.
   placeholder: string;
 }
@@ -45,7 +45,7 @@ export interface QuaireItem {
   selectOptions?: Array<QuaireItemOption> | Record<string, Array<QuaireItemOption>>;
   rangeOption?: QuaireRangeItemOption;
   inputOption?: QuaireInputItemOption;
-  defaultValues?: any;
+  defaultValue?: any;
   nextItemId?: number;
 }
 
