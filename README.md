@@ -49,6 +49,13 @@ the view or the behaviour. This pattern provides a nice separation of:
 
 ## Extend quaire behaviour
 
+# Examples
+
+- [Linear flow](./examples/linear-flow)
+- [Linear flow with a loop](./examples/linear-flow-with-loop)
+- [Linear flow with option question](./examples/linear-flow-skip-question)
+- [Branched flow that merges back into one](./examples/branched-and-merged-flow)
+
 # Contribute
 
 Contributions are always welcome! Please read the [contribution guidelines](https://github.com/devCrossNet/quaire/blob/master/.github/CONTRIBUTING.md) first.
