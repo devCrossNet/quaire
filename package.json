@@ -1,7 +1,7 @@
 {
   "name": "quaire",
   "version": "0.0.0",
-  "description": "a framework-agnostic library to build user-flows, surveys, and questionnaires",
+  "description": "a framework-agnostic library to create user-flows, surveys, and questionnaires",
   "keywords": [
     "user-flow",
     "user-flows",
