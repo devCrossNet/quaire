@@ -46,6 +46,14 @@ the view or the behaviour. This pattern provides a nice separation of:
 
 # How does it work?
 
+## Installation
+
+```shell
+npm i --save quaire
+```
+
+
+
 ## Define quaire data
 
 First you need to define the data (decision tree) based on the
@@ -56,6 +64,8 @@ or a dynamic JSON from a CMS or backend API.
 The structure for questions looks as follows:
 
 ```js
+import { QuaireComponentType, QuaireItem, QuaireNavigationItem } from 'quaire';
+
 export const items: QuaireItem[] = [
   {
     id: 1,
@@ -104,6 +114,8 @@ To use the default behavior you need to initialize `Quaire` with the data you
 defined in the former step.
 
 ```js
+import { Quaire } from 'quaire';
+
 const q = new Quaire({ items, navigationItems }); // (optional) you can pass an existing result to restore the questionnaire
 ```
 
