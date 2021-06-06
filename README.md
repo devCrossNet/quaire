@@ -4,7 +4,7 @@ a framework-agnostic library to build user-flows, surveys, and questionnaires
 
 # Why the name?
 
-Because you need one and `questionnaire` is terrible to type.
+Because I needed one and `questionnaire` is terrible to type.
 
 # What use-case does it try to solve?
 
@@ -26,7 +26,7 @@ but I ended up with spaghetti state machines most of the time
 due to regular changes in the user-flow (re-arranging questions, adding questions, skip questions, etc.)
 
 The solution I found to work best for me was a concept of game-development called decision-tree.
-That way the whole user-flow is based on a static set of data that can be changed without the need of changing
+That way the whole user-flow is based on a static data structure that can be changed without the need of changing
 the view or the behaviour. This pattern provides a nice separation of:
 
 - data
@@ -35,15 +35,15 @@ the view or the behaviour. This pattern provides a nice separation of:
 
 # Features?
 
-- framework-agnostic
-- zero dependencies
-- view independent
-- [linear user-flow](./examples/linear-flow)
-- [branched/merged user-flow](./examples/branched-and-merged-flow)
-- [loops](./examples/linear-flow-with-loop)
-- dependencies between questions and validation
-- re-storing state of the questionnaire from the selected answers
-- navigation
+- Framework-agnostic
+- Zero dependencies
+- View independent
+- [Linear user-flow](./examples/linear-flow)
+- [Branched/merged user-flow](./examples/branched-and-merged-flow)
+- [Loops](./examples/linear-flow-with-loop)
+- Dependencies between questions and validation
+- Re-storing state of the questionnaire from the selected answers
+- Navigation
 
 # How does it work?
 
@@ -52,7 +52,7 @@ the view or the behaviour. This pattern provides a nice separation of:
 First you need to define the data (decision tree) based on the
 [QuaireItem interface](./src/interfaces.ts). This can be static
 data in a JS/TS file, a JSON file that you load on demand
-or a dynamic JSON from a CMS or backend api.
+or a dynamic JSON from a CMS or backend API.
 
 The structure for questions looks as follows:
 
