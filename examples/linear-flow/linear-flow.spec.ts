@@ -2,7 +2,7 @@ import { Quaire } from '../../src';
 import { items, navigationItems } from './data';
 
 describe('linear-flow', () => {
-  let Q;
+  let Q: Quaire;
 
   beforeEach(() => {
     Q = new Quaire({ items, navigationItems });
@@ -39,6 +39,7 @@ describe('linear-flow', () => {
         componentType: 'SINGLE_SELECT',
         hasValue: true,
         id: 1,
+        isValid: true,
         name: 'Category 1',
         value: 'Option 1',
         subCategories: [
@@ -58,6 +59,7 @@ describe('linear-flow', () => {
         componentType: 'SINGLE_SELECT',
         hasValue: true,
         id: 3,
+        isValid: true,
         name: 'Category 2',
         value: 'Option 1',
         subCategories: [],

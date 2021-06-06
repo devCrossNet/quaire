@@ -19,8 +19,8 @@ export interface QuaireOptions {
 
 export interface QuaireItemOption {
   [key: string]: unknown;
-  label: string;
-  value: unknown;
+  label?: string;
+  value?: unknown;
   nextItemId?: number;
 }
 
@@ -42,7 +42,7 @@ export interface QuaireItem {
   dependsOnResultProperties: Array<string>;
   componentType: QuaireComponentType;
   navigationItemId?: number;
-  selectOptions?: Array<QuaireItemOption> | Record<string, Array<QuaireItemOption>>;
+  selectOptions?: Array<QuaireItemOption> | QuaireItemOption;
   rangeOption?: QuaireRangeItemOption;
   inputOption?: QuaireInputItemOption;
   defaultValue?: any;

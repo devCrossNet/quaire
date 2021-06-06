@@ -39,6 +39,7 @@ describe('linear-flow-with-loop', () => {
         componentType: 'SINGLE_SELECT',
         hasValue: true,
         id: 1,
+        isValid: true,
         name: 'Category 1',
         value: 'Option 1',
         subCategories: [
@@ -58,6 +59,7 @@ describe('linear-flow-with-loop', () => {
         componentType: 'SINGLE_SELECT',
         hasValue: true,
         id: 3,
+        isValid: true,
         name: 'Category 2',
         value: 'Option 2',
         subCategories: [],

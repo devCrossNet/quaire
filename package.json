@@ -35,6 +35,9 @@
   "bugs": {
     "url": "https://github.com/vuesion/packages/issues"
   },
+  "dependencies": {
+    "lodash.get": "^4.4.2"
+  },
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
@@ -84,10 +87,10 @@
     ],
     "coverageThreshold": {
       "global": {
-        "branches": 100,
-        "functions": 100,
-        "lines": 100,
-        "statements": 100
+        "branches": 81,
+        "functions": 85,
+        "lines": 85,
+        "statements": 85
       }
     },
     "coveragePathIgnorePatterns": [

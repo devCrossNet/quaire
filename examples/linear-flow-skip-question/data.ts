@@ -1,4 +1,4 @@
-import { QuaireComponentType, QuaireItem, QuaireNavigationItem } from '../../src';
+import { NO_VALUE, QuaireComponentType, QuaireItem, QuaireNavigationItem } from '../../src';
 
 export const items: QuaireItem[] = [
   {
@@ -39,8 +39,8 @@ export const items: QuaireItem[] = [
         nextItemId: 3,
       },
       {
-        label: 'Option 2',
-        value: 'option 2',
+        label: 'Skip',
+        value: NO_VALUE,
         nextItemId: 3,
       },
     ],

@@ -1,3 +1,4 @@
+import * as _get from 'lodash.get';
 import { NO_VALUE } from './constants';
 import {
   QuaireBase,
@@ -66,17 +67,25 @@ export class Quaire implements QuaireBase {
     selectOptions: QuaireItemOption[],
     rangeOption: QuaireRangeItemOption,
     inputOption: QuaireInputItemOption,
-    defaultOption: any,
+    defaultValue: any,
   ): QuaireQuestion {
+    const value = this._getResultByValueProperty(item.resultProperty);
+
+    let isValid = true;
+
+    if ((!value && item.required) || this._validationErrors[item.id]) {
+      isValid = false;
+    }
+
     return {
-      id: item?.id,
-      navigationItemId: item?.navigationItemId,
-      question: item?.question,
-      description: item?.description,
-      required: item?.required,
-      resultProperty: item?.resultProperty,
-      value: this._getResultByValueProperty(item?.resultProperty),
-      componentType: item?.componentType,
+      id: item.id,
+      navigationItemId: item.navigationItemId,
+      question: item.question,
+      description: item.description,
+      required: item.required,
+      resultProperty: item.resultProperty,
+      value,
+      componentType: item.componentType,
       dependsOnQuestions: this._items
         .map((i) => {
           if (dependsOnKeys.includes(i.resultProperty)) {
@@ -89,28 +98,45 @@ export class Quaire implements QuaireBase {
       selectOptions,
       rangeOption,
       inputOption,
-      defaultValue: defaultOption,
-      isValid: item ? !this._validationErrors[item.id] : false,
-      nextItemId: item?.nextItemId,
+      defaultValue,
+      isValid,
+      nextItemId: item.nextItemId,
     };
+  }
+
+  private _getDependencyPath(dependsOnResultProperties: Array<string>) {
+    const path: Array<string> = [];
+
+    dependsOnResultProperties.forEach((resultProperty) => {
+      const resultPropertyValue = this._getResultByValueProperty(resultProperty);
+
+      if (resultPropertyValue) {
+        path.push(resultProperty);
+        path.push(resultPropertyValue);
+      }
+    });
+
+    return path;
   }
 
   private _getQuestion(itemId: number): QuaireQuestion {
     const item = this._getItem(itemId);
-    const dependsOnKey = item.dependsOnResultProperties[0] || 'default';
-    const dependsOnValue = this._getResultByValueProperty(dependsOnKey) || 'default';
     let selectOptions: Array<QuaireItemOption>;
     let rangeOption: QuaireRangeItemOption;
     let inputOption: QuaireInputItemOption;
-    let defaultOption: any;
+    let defaultValue: any;
 
     if (item.dependsOnResultProperties.length > 0) {
-      // TODO: recursive keys
+      const path = this._getDependencyPath(item.dependsOnResultProperties);
+      selectOptions = _get(item.selectOptions, path, null);
+      rangeOption = _get(item.rangeOption, path, null);
+      inputOption = _get(item.inputOption, path, null);
+      defaultValue = _get(item.defaultValue, path, null);
     } else {
       selectOptions = item.selectOptions ? (item.selectOptions as Array<QuaireItemOption>) : null;
       rangeOption = item.rangeOption ? item.rangeOption : null;
       inputOption = item.inputOption ? item.inputOption : null;
-      defaultOption = item.defaultValue ? item.defaultValue : null;
+      defaultValue = item.defaultValue ? item.defaultValue : null;
     }
 
     return this._getQuestionObject(
@@ -119,7 +145,7 @@ export class Quaire implements QuaireBase {
       selectOptions,
       rangeOption,
       inputOption,
-      defaultOption,
+      defaultValue,
     );
   }
 
@@ -274,36 +300,7 @@ export class Quaire implements QuaireBase {
     this._validate(activeQuestion);
   }
 
-  private _addParentCategory(
-    navigationItems: { [key: string]: QuaireNavigationItem },
-    activeNavigationItem: QuaireNavigationItem,
-    navigationItem: QuaireNavigationItem,
-  ) {
-    const question = this._getQuestionByNavigationItemId(navigationItem.id);
-    const answer = this._getResultByValueProperty(question.resultProperty);
-    const active = activeNavigationItem.id === navigationItem.id;
-    let hasValue = Boolean(answer);
-    let value: any = null;
-
-    if (answer === NO_VALUE) {
-      value = `No value selected`;
-    } else if (answer) {
-      value = this._getChildCategoryValue(question, answer);
-    }
-
-    navigationItems[navigationItem.id] = {
-      id: navigationItem.id,
-      name: navigationItem.name,
-      value,
-      icon: navigationItem.icon,
-      active,
-      hasValue,
-      subCategories: [],
-      componentType: question.componentType,
-    };
-  }
-
-  private _getChildCategoryValue(question: QuaireQuestion, answer: any) {
+  private _getNavigationValue(question: QuaireQuestion, answer: any) {
     let value: string;
 
     if (this._selectComponentTypes.includes(question.componentType)) {
@@ -315,53 +312,70 @@ export class Quaire implements QuaireBase {
     return value;
   }
 
-  private _addChildCategory(
-    navigationItems: { [key: string]: QuaireNavigationItem },
+  private _getNavigationItem(
     activeNavigationItem: QuaireNavigationItem,
     navigationItem: QuaireNavigationItem,
+    isParent = true,
   ) {
     const question = this._getQuestionByNavigationItemId(navigationItem.id);
     const answer = this._getResultByValueProperty(question.resultProperty);
     const active = activeNavigationItem.id === navigationItem.id;
-    const isValid = question.id && question.isValid;
+    const isValid = question.isValid;
+    const hasValue = Boolean(answer);
     let value: any = null;
 
     if (answer === NO_VALUE) {
-      value = `No value selected`;
+      value = NO_VALUE;
     } else if (answer) {
-      value = this._getChildCategoryValue(question, answer);
+      value = this._getNavigationValue(question, answer);
     }
 
-    navigationItems[navigationItem.parentId].subCategories.push({
+    const item: QuaireNavigationItem = {
       id: navigationItem.id,
       name: navigationItem.name,
       value,
       icon: navigationItem.icon,
       active,
-      isValid: active ? true : isValid,
-      hasValue: active ? false : Boolean(answer),
+      isValid,
+      hasValue,
       componentType: question.componentType,
-    });
+    };
+
+    if (isParent) {
+      item.subCategories = [];
+    }
+
+    return item;
+  }
+
+  private _addChildNavigationItem(
+    navigationItems: { [key: string]: QuaireNavigationItem },
+    activeNavigationItem: QuaireNavigationItem,
+    navigationItem: QuaireNavigationItem,
+  ) {
+    const subCategory = this._getNavigationItem(activeNavigationItem, navigationItem, false);
+
+    navigationItems[navigationItem.parentId].subCategories.push(subCategory);
     navigationItems[navigationItem.parentId].active =
       navigationItems[navigationItem.parentId].active || activeNavigationItem.parentId === navigationItem.parentId;
     navigationItems[navigationItem.parentId].hasValue = true;
   }
 
   public getNavigation = (): QuaireNavigationItem[] => {
-    const result: { [key: string]: QuaireNavigationItem } = {};
-    const activeCategory = this._getActiveQuestionNavigationItem();
+    const navigationItems: { [key: string]: QuaireNavigationItem } = {};
+    const activeNavigationItem = this._getActiveQuestionNavigationItem();
 
-    this._navigationItems.forEach((category) => {
-      const hasParent = Boolean(category.parentId);
+    this._navigationItems.forEach((navigationItem) => {
+      const hasParent = Boolean(navigationItem.parentId);
 
       if (hasParent === false) {
-        this._addParentCategory(result, activeCategory, category);
+        navigationItems[navigationItem.id] = this._getNavigationItem(activeNavigationItem, navigationItem);
       } else {
-        this._addChildCategory(result, activeCategory, category);
+        this._addChildNavigationItem(navigationItems, activeNavigationItem, navigationItem);
       }
     });
 
-    return Object.values(result);
+    return Object.values(navigationItems);
   };
 
   public isValid() {

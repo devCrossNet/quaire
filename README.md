@@ -4,7 +4,7 @@ a framework-agnostic library to create user-flows, surveys, and questionnaires
 
 # Why the name?
 
-Because I needed one and `questionnaire` is terrible to type.
+Because I needed one and `questionnaire` is terrible to type. Let me know if you have a better one!
 
 # What use-case does it try to solve?
 
@@ -36,7 +36,6 @@ the view or the behaviour. This pattern provides a nice separation of:
 # Features?
 
 - Framework-agnostic
-- Zero dependencies
 - View independent
 - [Linear user-flow](./examples/linear-flow)
 - [Branched/merged user-flow](./examples/branched-and-merged-flow)
@@ -149,7 +148,7 @@ the result object of the Questionnaire.
 onSubmit(value: any) {
     // ...
     const isValid = q.isValid();
-    
+
     // check if the questionnaire is valid
     if(!isValid) {
         return;
@@ -170,6 +169,7 @@ onSubmit(value: any) {
 ```
 
 # Extend quaire
+
 TBD
 
 # Examples

@@ -39,6 +39,7 @@ describe('branched-and-merged-flow', () => {
         componentType: 'SINGLE_SELECT',
         hasValue: true,
         id: 1,
+        isValid: true,
         name: 'Category 1',
         subCategories: [
           {
@@ -58,6 +59,7 @@ describe('branched-and-merged-flow', () => {
         componentType: 'SINGLE_SELECT',
         hasValue: true,
         id: 3,
+        isValid: true,
         name: 'Category 2',
         subCategories: [],
         value: 'Option 1',
@@ -96,6 +98,7 @@ describe('branched-and-merged-flow', () => {
         componentType: 'SINGLE_SELECT',
         hasValue: true,
         id: 1,
+        isValid: true,
         name: 'Category 1',
         subCategories: [
           {
@@ -115,6 +118,7 @@ describe('branched-and-merged-flow', () => {
         componentType: 'SINGLE_SELECT',
         hasValue: true,
         id: 3,
+        isValid: true,
         name: 'Category 2',
         subCategories: [],
         value: 'Option 1',
