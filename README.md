@@ -40,7 +40,7 @@ the view or the behaviour. This pattern provides a nice separation of:
 - [Linear user-flow](./examples/linear-flow)
 - [Branched/merged user-flow](./examples/branched-and-merged-flow)
 - [Loops](./examples/linear-flow-with-loop)
-- Dependencies between questions and validation
+- [Dependencies between questions and validation](./examples/dependencies-between-questions)
 - Re-storing state of the questionnaire from the selected answers
 - Navigation
 
@@ -178,6 +178,7 @@ TBD
 - [Linear flow with a loop](./examples/linear-flow-with-loop)
 - [Linear flow with option question](./examples/linear-flow-skip-question)
 - [Branched flow that merges back into one](./examples/branched-and-merged-flow)
+- [Dependencies between questions and validation](./examples/dependencies-between-questions)
 
 # Contribute
 
