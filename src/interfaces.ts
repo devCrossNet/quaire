@@ -44,7 +44,7 @@ export interface QuaireItem {
   required: boolean;
   resultProperty: string;
   dependsOnResultProperties: Array<string>;
-  componentType: QuaireComponentType;
+  componentType: QuaireComponentType | string;
   navigationItemId?: number;
   selectOptions?: Array<QuaireItemOption> | QuaireItemOption;
   rangeOption?: QuaireRangeItemOption;
@@ -63,7 +63,7 @@ export interface QuaireNavigationItem {
   isValid?: boolean;
   hasValue?: boolean;
   subNavigation?: Array<QuaireNavigationItem>;
-  componentType?: QuaireComponentType;
+  componentType?: QuaireComponentType | string;
 }
 
 export interface QuaireQuestion {
@@ -75,7 +75,7 @@ export interface QuaireQuestion {
   resultProperty: string;
   value: any;
   valueHasChanged?: boolean;
-  componentType: QuaireComponentType;
+  componentType: QuaireComponentType | string;
   isValid: boolean;
   dependsOnQuestions: Array<QuaireQuestion>;
   selectOptions?: Array<QuaireItemOption>;

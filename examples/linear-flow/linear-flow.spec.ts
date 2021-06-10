@@ -12,18 +12,19 @@ describe('linear-flow', () => {
     let activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 1');
 
-    Q.saveAnswer('option 1');
+    Q.saveAnswer('option 4');
+    activeQuestion = Q.getActiveQuestion();
+    expect(activeQuestion.question).toBe('Question 1');
 
+    Q.saveAnswer('option 1');
     activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 2');
 
     Q.saveAnswer('option 2');
-
     activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 3');
 
     Q.saveAnswer('option 1');
-
     activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 3');
 

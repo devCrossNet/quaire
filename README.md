@@ -180,7 +180,7 @@ onSubmit(value: any) {
 
 # Extend quaire
 
-TBD
+- [Custom component types](./examples/custom-component-types)
 
 # Examples
 
