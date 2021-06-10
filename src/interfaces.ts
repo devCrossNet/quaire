@@ -18,19 +18,23 @@ export interface QuaireOptions {
 }
 
 export interface QuaireItemOption {
-  [key: string]: unknown;
+  [key: string]: unknown | QuaireItemOption;
   label?: string;
   value?: unknown;
   nextItemId?: number;
 }
 
-export interface QuaireRangeItemOption extends Partial<QuaireItemOption> {
-  range: Array<number>;
+export interface QuaireRangeItemOption {
+  [key: string]: unknown | QuaireRangeItemOption;
+  range?: Array<number>;
+  nextItemId?: number;
 }
 
-export interface QuaireInputItemOption extends Partial<QuaireItemOption> {
-  type: string; // HTML input type e.g. text, number, date, etc.
-  placeholder: string;
+export interface QuaireInputItemOption {
+  [key: string]: unknown | QuaireInputItemOption;
+  type?: string; // HTML input type e.g. text, number, date, etc.
+  placeholder?: string;
+  nextItemId?: number;
 }
 
 export interface QuaireItem {

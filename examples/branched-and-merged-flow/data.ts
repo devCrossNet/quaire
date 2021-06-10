@@ -1,6 +1,6 @@
 import { QuaireComponentType, QuaireItem, QuaireNavigationItem } from '../../src';
 
-export const items: QuaireItem[] = [
+export const items: Array<QuaireItem> = [
   {
     id: 1, // Branch A/B
     resultProperty: 'foo',
@@ -76,7 +76,7 @@ export const items: QuaireItem[] = [
   },
 ];
 
-export const navigationItems: QuaireNavigationItem[] = [
+export const navigationItems: Array<QuaireNavigationItem> = [
   {
     id: 1,
     parentId: null,

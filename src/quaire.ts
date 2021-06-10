@@ -14,19 +14,23 @@ import { QuaireComponentType, QuaireValidationError } from './enums';
 import { hasAnswer } from './utils';
 
 export class Quaire implements QuaireBase {
-  private _activeItemId = 1;
+  private _activeItemId = null;
   private readonly _items: QuaireItem[];
   private readonly _navigationItems: QuaireNavigationItem[];
   private readonly _result: Record<string, any> = {};
   private readonly _validationErrors: Record<number, QuaireValidationError> = {};
 
-  private readonly _selectComponentTypes = [QuaireComponentType.SINGLE_SELECT, QuaireComponentType.MULTI_SELECT];
+  private readonly _selectComponentTypes = [QuaireComponentType.SINGLE_SELECT];
   private readonly _rangeComponentTypes = [QuaireComponentType.RANGE_SLIDER];
   private readonly _inputComponentTypes = [QuaireComponentType.INPUT];
 
   constructor({ items, navigationItems, result }: QuaireOptions) {
     this._items = items;
     this._navigationItems = navigationItems || [];
+
+    if (items.length > 0) {
+      this._activeItemId = this._items[0].id;
+    }
 
     if (result) {
       this._result = result;
@@ -226,7 +230,6 @@ export class Quaire implements QuaireBase {
         delete this._validationErrors[question.id];
       } else if (currentAnswer && question.componentType === QuaireComponentType.SINGLE_SELECT) {
         this._validateSingleSelectComponent(question, currentAnswer);
-        // TODO: handle multi-select
       } else if (currentAnswer && question.componentType === QuaireComponentType.RANGE_SLIDER) {
         this._validateRangeComponent(question, activeQuestion);
       } else if (
@@ -252,8 +255,10 @@ export class Quaire implements QuaireBase {
     let quaireItem = this._items.find((item) => item.navigationItemId === navigationItemId);
 
     if (!quaireItem) {
-      const firstChildCategory = this._navigationItems.find((cc) => cc.parentId === navigationItemId);
-      quaireItem = this._items.find((item) => item.navigationItemId === firstChildCategory.id);
+      const firstChildNavigationItem = this._navigationItems.find(
+        (navigationItem) => navigationItem.parentId === navigationItemId,
+      );
+      quaireItem = this._items.find((item) => item.navigationItemId === firstChildNavigationItem.id);
     }
 
     this._activeItemId = quaireItem.id;
@@ -282,7 +287,6 @@ export class Quaire implements QuaireBase {
     delete this._validationErrors[activeQuestion.id];
 
     if (this._selectComponentTypes.includes(activeQuestion.componentType)) {
-      // TODO handle multi-select
       const option = activeQuestion.selectOptions.find((o) => o.value === answer);
 
       nextItemId = option?.nextItemId;
