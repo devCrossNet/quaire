@@ -41,7 +41,7 @@ describe('branched-and-merged-flow', () => {
         id: 1,
         isValid: true,
         name: 'Category 1',
-        subCategories: [
+        subNavigation: [
           {
             active: false,
             componentType: 'RANGE_SLIDER',
@@ -61,7 +61,7 @@ describe('branched-and-merged-flow', () => {
         id: 3,
         isValid: true,
         name: 'Category 2',
-        subCategories: [],
+        subNavigation: [],
         value: 'Option 1',
       },
     ]);
@@ -100,7 +100,7 @@ describe('branched-and-merged-flow', () => {
         id: 1,
         isValid: true,
         name: 'Category 1',
-        subCategories: [
+        subNavigation: [
           {
             active: false,
             componentType: 'INPUT',
@@ -120,7 +120,7 @@ describe('branched-and-merged-flow', () => {
         id: 3,
         isValid: true,
         name: 'Category 2',
-        subCategories: [],
+        subNavigation: [],
         value: 'Option 1',
       },
     ]);

@@ -48,8 +48,15 @@ export class Quaire implements QuaireBase {
       this.saveAnswer(answer);
 
       const currentQuestion = this.getActiveQuestion();
-      activeQuestion = activeQuestion.id === currentQuestion.id ? null : currentQuestion;
-      answer = activeQuestion ? this._result[activeQuestion.resultProperty] : null;
+
+      if (activeQuestion.id !== currentQuestion.id) {
+        activeQuestion = currentQuestion;
+
+        answer = this._result[activeQuestion.resultProperty];
+      } else {
+        activeQuestion = null;
+        answer = null;
+      }
 
       if (!hasAnswer(answer)) {
         break;
@@ -184,7 +191,7 @@ export class Quaire implements QuaireBase {
     );
 
     if (isActiveQuestionADependency && activeQuestion.required && activeQuestion.valueHasChanged) {
-      this._result[question.resultProperty] = null;
+      delete this._result[question.resultProperty];
       this._validationErrors[question.id] = QuaireValidationError.REQUIRED;
     }
   }
@@ -215,7 +222,7 @@ export class Quaire implements QuaireBase {
         question.dependsOnQuestions.length > 0 ? possibleFollowUpQuestionIds.includes(question.id) : true;
 
       if (isQuestionInCurrentFlow === false) {
-        this._result[question.resultProperty] = null;
+        delete this._result[question.resultProperty];
         delete this._validationErrors[question.id];
       } else if (currentAnswer && question.componentType === QuaireComponentType.SINGLE_SELECT) {
         this._validateSingleSelectComponent(question, currentAnswer);
@@ -276,13 +283,9 @@ export class Quaire implements QuaireBase {
 
     if (this._selectComponentTypes.includes(activeQuestion.componentType)) {
       // TODO handle multi-select
-      let option = activeQuestion.selectOptions.find((o) => o.value === answer);
+      const option = activeQuestion.selectOptions.find((o) => o.value === answer);
 
-      if (!option && activeQuestion.selectOptions.length > 0) {
-        option = activeQuestion.selectOptions[0];
-      }
-
-      nextItemId = option.nextItemId;
+      nextItemId = option?.nextItemId;
     } else if (this._rangeComponentTypes.includes(activeQuestion.componentType)) {
       nextItemId = activeQuestion.rangeOption.nextItemId;
     } else if (this._inputComponentTypes.includes(activeQuestion.componentType)) {
@@ -342,10 +345,18 @@ export class Quaire implements QuaireBase {
     };
 
     if (isParent) {
-      item.subCategories = [];
+      item.subNavigation = [];
     }
 
     return item;
+  }
+
+  private _addNavigationItem(
+    navigationItems: { [key: string]: QuaireNavigationItem },
+    activeNavigationItem: QuaireNavigationItem,
+    navigationItem: QuaireNavigationItem,
+  ) {
+    navigationItems[navigationItem.id] = this._getNavigationItem(activeNavigationItem, navigationItem);
   }
 
   private _addChildNavigationItem(
@@ -355,7 +366,7 @@ export class Quaire implements QuaireBase {
   ) {
     const subCategory = this._getNavigationItem(activeNavigationItem, navigationItem, false);
 
-    navigationItems[navigationItem.parentId].subCategories.push(subCategory);
+    navigationItems[navigationItem.parentId].subNavigation.push(subCategory);
     navigationItems[navigationItem.parentId].active =
       navigationItems[navigationItem.parentId].active || activeNavigationItem.parentId === navigationItem.parentId;
     navigationItems[navigationItem.parentId].hasValue = true;
@@ -369,7 +380,7 @@ export class Quaire implements QuaireBase {
       const hasParent = Boolean(navigationItem.parentId);
 
       if (hasParent === false) {
-        navigationItems[navigationItem.id] = this._getNavigationItem(activeNavigationItem, navigationItem);
+        this._addNavigationItem(navigationItems, activeNavigationItem, navigationItem);
       } else {
         this._addChildNavigationItem(navigationItems, activeNavigationItem, navigationItem);
       }

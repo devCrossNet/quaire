@@ -58,7 +58,7 @@ export interface QuaireNavigationItem {
   active?: boolean;
   isValid?: boolean;
   hasValue?: boolean;
-  subCategories?: Array<QuaireNavigationItem>;
+  subNavigation?: Array<QuaireNavigationItem>;
   componentType?: QuaireComponentType;
 }
 

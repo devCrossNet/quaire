@@ -29,7 +29,7 @@
     "clean": "rimraf ./dist",
     "dev": "tsc --watch",
     "test": "jest --coverage",
-    "prettier": "prettier --config .prettierrc --ignore-path .prettierignore ./packages/**/*.{ts,js}",
+    "prettier": "prettier --config=.prettierrc --ignore-path=.prettierignore --write './src/**/*.{ts,js}' './examples/**/*.{ts,js}'",
     "lint": "eslint . --ext ts,vue --fix --cache"
   },
   "bugs": {
@@ -87,10 +87,10 @@
     ],
     "coverageThreshold": {
       "global": {
-        "branches": 81,
-        "functions": 85,
-        "lines": 85,
-        "statements": 85
+        "branches": 89,
+        "functions": 89,
+        "lines": 94,
+        "statements": 93
       }
     },
     "coveragePathIgnorePatterns": [

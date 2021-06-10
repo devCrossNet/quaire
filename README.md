@@ -4,7 +4,7 @@ a framework-agnostic library to create user-flows, surveys, and questionnaires
 
 # Why the name?
 
-Because I needed one and `questionnaire` is terrible to type. Let me know if you have a better one!
+Because I needed one and `Questionnaire` is terrible to type. Let me know if you have a better one!
 
 # What use-case does it try to solve?
 
@@ -41,7 +41,7 @@ the view or the behaviour. This pattern provides a nice separation of:
 - [Branched/merged user-flow](./examples/branched-and-merged-flow)
 - [Loops](./examples/linear-flow-with-loop)
 - [Dependencies between questions and validation](./examples/dependencies-between-questions)
-- Re-storing state of the questionnaire from the selected answers
+- [Re-storing state of the questionnaire from the selected answers](./examples/restore-state.spec.ts)
 - Navigation
 
 # How does it work?
@@ -51,8 +51,6 @@ the view or the behaviour. This pattern provides a nice separation of:
 ```shell
 npm i --save quaire
 ```
-
-
 
 ## Define quaire data
 
@@ -191,6 +189,7 @@ TBD
 - [Linear flow with option question](./examples/linear-flow-skip-question)
 - [Branched flow that merges back into one](./examples/branched-and-merged-flow)
 - [Dependencies between questions and validation](./examples/dependencies-between-questions)
+- [Re-storing state of the questionnaire from the selected answers](./examples/restore-state.spec.ts)
 
 # Contribute
 

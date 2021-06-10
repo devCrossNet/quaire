@@ -68,7 +68,7 @@ describe('dependencies-between-questions', () => {
         id: 1,
         isValid: true,
         name: 'Category 1',
-        subCategories: [
+        subNavigation: [
           {
             active: false,
             componentType: 'SINGLE_SELECT',
@@ -88,7 +88,7 @@ describe('dependencies-between-questions', () => {
         id: 3,
         isValid: true,
         name: 'Category 2',
-        subCategories: [],
+        subNavigation: [],
         value: 'Option 1.1.1',
       },
     ]);
@@ -112,7 +112,7 @@ describe('dependencies-between-questions', () => {
         id: 1,
         isValid: true,
         name: 'Category 1',
-        subCategories: [
+        subNavigation: [
           {
             active: false,
             componentType: 'SINGLE_SELECT',
@@ -132,7 +132,7 @@ describe('dependencies-between-questions', () => {
         id: 3,
         isValid: true,
         name: 'Category 2',
-        subCategories: [],
+        subNavigation: [],
         value: 'Option 1.1.1',
       },
     ]);
@@ -143,7 +143,6 @@ describe('dependencies-between-questions', () => {
     expect(Q.getResult()).toEqual({
       foo: 'option 2',
       bar: null,
-      baz: null,
     });
     expect(Q.isValid()).toBeFalsy();
     expect(Q.getValidationErrors()).toEqual({
@@ -157,7 +156,7 @@ describe('dependencies-between-questions', () => {
         id: 1,
         isValid: true,
         name: 'Category 1',
-        subCategories: [
+        subNavigation: [
           {
             active: true,
             componentType: 'SINGLE_SELECT',
@@ -177,7 +176,7 @@ describe('dependencies-between-questions', () => {
         id: 3,
         isValid: false,
         name: 'Category 2',
-        subCategories: [],
+        subNavigation: [],
         value: null,
       },
     ]);
@@ -198,7 +197,7 @@ describe('dependencies-between-questions', () => {
         id: 1,
         isValid: true,
         name: 'Category 1',
-        subCategories: [
+        subNavigation: [
           {
             active: false,
             componentType: 'SINGLE_SELECT',
@@ -218,7 +217,7 @@ describe('dependencies-between-questions', () => {
         id: 3,
         isValid: true,
         name: 'Category 2',
-        subCategories: [],
+        subNavigation: [],
         value: 'Option 2.2.2',
       },
     ]);

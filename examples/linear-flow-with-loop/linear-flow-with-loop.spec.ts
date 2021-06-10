@@ -42,7 +42,7 @@ describe('linear-flow-with-loop', () => {
         isValid: true,
         name: 'Category 1',
         value: 'Option 1',
-        subCategories: [
+        subNavigation: [
           {
             active: false,
             componentType: 'SINGLE_SELECT',
@@ -62,7 +62,7 @@ describe('linear-flow-with-loop', () => {
         isValid: true,
         name: 'Category 2',
         value: 'Option 2',
-        subCategories: [],
+        subNavigation: [],
       },
     ]);
   });
