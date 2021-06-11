@@ -1,0 +1,10 @@
+.github
+coverage
+src
+.eslintcache
+.eslintignore
+.eslintrc.js
+.prettierignore
+.prettierrc
+commitlint.config.js
+tsconfig.json
