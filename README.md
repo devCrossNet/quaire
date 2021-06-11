@@ -181,6 +181,7 @@ onSubmit(value: any) {
 # Extend quaire
 
 - [Custom component types](./examples/custom-component-types)
+- [Extending data definition](./examples/extending-data-definition)
 
 # Examples
 

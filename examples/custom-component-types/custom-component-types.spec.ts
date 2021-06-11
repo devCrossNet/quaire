@@ -1,9 +1,8 @@
 import { items, navigationItems } from './data';
-import { Quaire } from '../../src';
 import { MyComponentType, MyQuaire } from './MyQuaire';
 
 describe('custom-component-types', () => {
-  let Q: Quaire;
+  let Q: MyQuaire;
 
   beforeEach(() => {
     Q = new MyQuaire({ items, navigationItems });

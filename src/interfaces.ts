@@ -11,9 +11,12 @@ export interface QuaireBase {
   getNavigation(): Array<QuaireNavigationItem>;
 }
 
-export interface QuaireOptions {
-  items: Array<QuaireItem>;
-  navigationItems?: Array<QuaireNavigationItem>;
+export interface QuaireOptions<
+  IItem extends QuaireItem = QuaireItem,
+  INavigationItem extends QuaireNavigationItem = QuaireNavigationItem,
+> {
+  items: Array<IItem>;
+  navigationItems?: Array<INavigationItem>;
   result?: Record<string, any>;
 }
 

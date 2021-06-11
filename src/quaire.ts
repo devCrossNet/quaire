@@ -13,10 +13,15 @@ import {
 import { QuaireComponentType, QuaireValidationError } from './enums';
 import { hasAnswer } from './utils';
 
-export class Quaire implements QuaireBase {
+export class Quaire<
+  IItem extends QuaireItem = QuaireItem,
+  IQuestion extends QuaireQuestion = QuaireQuestion,
+  INavigationItem extends QuaireNavigationItem = QuaireNavigationItem,
+> implements QuaireBase
+{
   protected _activeItemId = null;
-  protected readonly _items: QuaireItem[];
-  protected readonly _navigationItems: QuaireNavigationItem[];
+  protected readonly _items: Array<IItem>;
+  protected readonly _navigationItems: Array<INavigationItem>;
   protected readonly _result: Record<string, any> = {};
   protected readonly _validationErrors: Record<number, QuaireValidationError> = {};
   protected readonly _selectComponentTypes: Array<string> = [QuaireComponentType.SINGLE_SELECT];
@@ -27,7 +32,7 @@ export class Quaire implements QuaireBase {
     QuaireComponentType.INPUT,
   ];
 
-  constructor({ items, navigationItems, result }: QuaireOptions) {
+  constructor({ items, navigationItems, result }: QuaireOptions<IItem, INavigationItem>) {
     this._items = items;
     this._navigationItems = navigationItems || [];
 
@@ -76,13 +81,13 @@ export class Quaire implements QuaireBase {
   }
 
   protected _getQuestionObject(
-    item: QuaireItem,
+    item: IItem,
     dependsOnKeys: string[],
     selectOptions: QuaireItemOption[],
     rangeOption: QuaireRangeItemOption,
     inputOption: QuaireInputItemOption,
     defaultValue: any,
-  ): QuaireQuestion {
+  ): IQuestion {
     const value = this._getResultByValueProperty(item.resultProperty);
 
     let isValid = true;
@@ -115,10 +120,11 @@ export class Quaire implements QuaireBase {
       defaultValue,
       isValid,
       nextItemId: item.nextItemId,
-    };
+      valueHasChanged: false,
+    } as any;
   }
 
-  protected _getDependencyPath(item: QuaireItem) {
+  protected _getDependencyPath(item: IItem) {
     const path: Array<string> = [];
 
     item.dependsOnResultProperties.forEach((resultProperty) => {
@@ -133,7 +139,7 @@ export class Quaire implements QuaireBase {
     return path;
   }
 
-  protected _getQuestion(itemId: number): QuaireQuestion {
+  protected _getQuestion(itemId: number) {
     const item = this._getItem(itemId);
     let selectOptions: Array<QuaireItemOption>;
     let rangeOption: QuaireRangeItemOption;
@@ -163,7 +169,7 @@ export class Quaire implements QuaireBase {
     );
   }
 
-  protected _getQuestionByNavigationItemId(categoryId: number): QuaireQuestion {
+  protected _getQuestionByNavigationItemId(categoryId: number) {
     let item = this._items
       .filter((item) => hasAnswer(this._result[item.resultProperty]))
       .find((i) => i.navigationItemId === categoryId);
@@ -183,7 +189,7 @@ export class Quaire implements QuaireBase {
     return this._navigationItems.find((bc) => bc.id === this.getActiveQuestion().navigationItemId);
   }
 
-  protected _validateSelectComponent(question: QuaireQuestion, currentAnswer: any) {
+  protected _validateSelectComponent(question: IQuestion, currentAnswer: any) {
     const option = question.selectOptions && question.selectOptions.find((o) => o.value === currentAnswer);
 
     if (question.required && !option) {
@@ -192,7 +198,7 @@ export class Quaire implements QuaireBase {
     }
   }
 
-  protected _validateRangeComponent(question: QuaireQuestion, activeQuestion: QuaireQuestion) {
+  protected _validateRangeComponent(question: IQuestion, activeQuestion: IQuestion) {
     const isActiveQuestionADependency = !!question.dependsOnQuestions.find(
       (dq) => dq.resultProperty === activeQuestion.resultProperty,
     );
@@ -205,8 +211,8 @@ export class Quaire implements QuaireBase {
 
   protected _validateGenericComponent(
     isQuestionInCurrentFlow: boolean,
-    question: QuaireQuestion,
-    activeQuestion: QuaireQuestion,
+    question: IQuestion,
+    activeQuestion: IQuestion,
     currentAnswer: any,
   ) {
     if (
@@ -219,7 +225,7 @@ export class Quaire implements QuaireBase {
     }
   }
 
-  protected _validate(activeQuestion: QuaireQuestion) {
+  protected _validate(activeQuestion: IQuestion) {
     this._items.forEach((item) => {
       const question = this._getQuestion(item.id);
       const currentAnswer = this._getResultByValueProperty(question.resultProperty);
@@ -290,16 +296,18 @@ export class Quaire implements QuaireBase {
     return null;
   }
 
-  protected _getNextItemIdFromSelectComponents = (activeQuestion: QuaireQuestion, answer: any) => {
+  protected _getNextItemIdFromSelectComponents = (activeQuestion: IQuestion, answer: any) => {
     const option = activeQuestion.selectOptions.find((o) => o.value === answer);
     return option?.nextItemId;
   };
 
-  protected _getNextItemIdFromRangeComponents = (activeQuestion: QuaireQuestion, answer: any) => {
+  // eslint-disable-next-line
+  protected _getNextItemIdFromRangeComponents = (activeQuestion: IQuestion, answer: any) => {
     return activeQuestion.rangeOption.nextItemId;
   };
 
-  protected _getNextItemIdFromInputComponents = (activeQuestion: QuaireQuestion, answer: any) => {
+  // eslint-disable-next-line
+  protected _getNextItemIdFromInputComponents = (activeQuestion: IQuestion, answer: any) => {
     return activeQuestion.inputOption.nextItemId;
   };
 
@@ -332,7 +340,7 @@ export class Quaire implements QuaireBase {
     this._validate(activeQuestion);
   }
 
-  protected _getNavigationValue(question: QuaireQuestion, answer: any): any {
+  protected _getNavigationValue(question: IQuestion, answer: any): any {
     let value: string;
 
     if (this._selectComponentTypes.includes(question.componentType)) {
@@ -344,13 +352,13 @@ export class Quaire implements QuaireBase {
     return value;
   }
 
-  protected _getNavigationItem(
-    activeNavigationItem: QuaireNavigationItem,
-    navigationItem: QuaireNavigationItem,
-    isParent = true,
-  ) {
-    const question = this._getQuestionByNavigationItemId(navigationItem.id);
-    const answer = this._getResultByValueProperty(question.resultProperty);
+  protected _getNavigationItemObject(
+    activeNavigationItem: INavigationItem,
+    navigationItem: INavigationItem,
+    question: IQuestion,
+    answer: any,
+    isParent: boolean,
+  ): INavigationItem {
     const active = activeNavigationItem.id === navigationItem.id;
     const isValid = question.isValid;
     const hasValue = Boolean(answer);
@@ -362,7 +370,7 @@ export class Quaire implements QuaireBase {
       value = this._getNavigationValue(question, answer);
     }
 
-    const item: QuaireNavigationItem = {
+    const item: any = {
       id: navigationItem.id,
       name: navigationItem.name,
       value,
@@ -380,18 +388,29 @@ export class Quaire implements QuaireBase {
     return item;
   }
 
+  protected _getNavigationItem(
+    activeNavigationItem: INavigationItem,
+    navigationItem: INavigationItem,
+    isParent = true,
+  ) {
+    const question = this._getQuestionByNavigationItemId(navigationItem.id);
+    const answer = this._getResultByValueProperty(question.resultProperty);
+
+    return this._getNavigationItemObject(activeNavigationItem, navigationItem, question, answer, isParent);
+  }
+
   protected _addNavigationItem(
-    navigationItems: { [key: string]: QuaireNavigationItem },
-    activeNavigationItem: QuaireNavigationItem,
-    navigationItem: QuaireNavigationItem,
+    navigationItems: { [key: string]: INavigationItem },
+    activeNavigationItem: INavigationItem,
+    navigationItem: INavigationItem,
   ) {
     navigationItems[navigationItem.id] = this._getNavigationItem(activeNavigationItem, navigationItem);
   }
 
   protected _addChildNavigationItem(
-    navigationItems: { [key: string]: QuaireNavigationItem },
-    activeNavigationItem: QuaireNavigationItem,
-    navigationItem: QuaireNavigationItem,
+    navigationItems: { [key: string]: INavigationItem },
+    activeNavigationItem: INavigationItem,
+    navigationItem: INavigationItem,
   ) {
     const subCategory = this._getNavigationItem(activeNavigationItem, navigationItem, false);
 
@@ -401,8 +420,8 @@ export class Quaire implements QuaireBase {
     navigationItems[navigationItem.parentId].hasValue = true;
   }
 
-  public getNavigation = (): QuaireNavigationItem[] => {
-    const navigationItems: { [key: string]: QuaireNavigationItem } = {};
+  public getNavigation = (): INavigationItem[] => {
+    const navigationItems: { [key: string]: INavigationItem } = {};
     const activeNavigationItem = this._getActiveQuestionNavigationItem();
 
     this._navigationItems.forEach((navigationItem) => {
