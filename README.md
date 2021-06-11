@@ -37,11 +37,11 @@ the view or the behaviour. This pattern provides a nice separation of:
 
 - Framework-agnostic
 - View independent
-- [Linear user-flow](./examples/linear-flow)
-- [Branched/merged user-flow](./examples/branched-and-merged-flow)
-- [Loops](./examples/linear-flow-with-loop)
-- [Dependencies between questions and validation](./examples/dependencies-between-questions)
-- [Re-storing state of the questionnaire from the selected answers](./examples/restore-state.spec.ts)
+- [Linear user-flow](https://github.com/devCrossNet/quaire/tree/main/examples/linear-flow)
+- [Branched/merged user-flow](https://github.com/devCrossNet/quaire/tree/main/examples/branched-and-merged-flow)
+- [Loops](https://github.com/devCrossNet/quaire/tree/main/examples/linear-flow-with-loop)
+- [Dependencies between questions and validation](https://github.com/devCrossNet/quaire/tree/main/examples/dependencies-between-questions)
+- [Re-storing state of the questionnaire from the selected answers](https://github.com/devCrossNet/quaire/blob/main/examples/restore-state.spec.ts)
 - Navigation
 
 # How does it work?
@@ -55,7 +55,7 @@ npm i --save quaire
 ## Define quaire data
 
 First you need to define the data (decision tree) based on the
-[QuaireItem interface](./src/interfaces.ts). This can be static
+[QuaireItem interface](https://github.com/devCrossNet/quaire/blob/main/src/interfaces.ts#L43). This can be static
 data in a JS/TS file, a JSON file that you load on demand
 or a dynamic JSON from a CMS or backend API.
 
@@ -180,17 +180,17 @@ onSubmit(value: any) {
 
 # Extend quaire
 
-- [Custom component types](./examples/custom-component-types)
-- [Extending data definition](./examples/extending-data-definition)
+- [Custom component types](https://github.com/devCrossNet/quaire/tree/main/examples/custom-component-types)
+- [Extending data definition](https://github.com/devCrossNet/quaire/tree/main/examples/extending-data-definition)
 
 # Examples
 
-- [Linear flow](./examples/linear-flow)
-- [Linear flow with a loop](./examples/linear-flow-with-loop)
-- [Linear flow with option question](./examples/linear-flow-skip-question)
-- [Branched flow that merges back into one](./examples/branched-and-merged-flow)
-- [Dependencies between questions and validation](./examples/dependencies-between-questions)
-- [Re-storing state of the questionnaire from the selected answers](./examples/restore-state.spec.ts)
+- [Linear flow](https://github.com/devCrossNet/quaire/tree/main/examples/linear-flow)
+- [Linear flow with a loop](https://github.com/devCrossNet/quaire/tree/main/examples/linear-flow-with-loop)
+- [Linear flow with option question](https://github.com/devCrossNet/quaire/tree/main/examples/linear-flow-skip-question)
+- [Branched flow that merges back into one](https://github.com/devCrossNet/quaire/tree/main/examples/branched-and-merged-flow)
+- [Dependencies between questions and validation](https://github.com/devCrossNet/quaire/tree/main/examples/dependencies-between-questions)
+- [Re-storing state of the questionnaire from the selected answers](https://github.com/devCrossNet/quaire/tree/main/examples/restore-state.spec.ts)
 
 # Contribute
 
