@@ -1,7 +1,13 @@
 {
   "name": "quaire",
-  "version": "0.0.0",
   "description": "a framework-agnostic library to create user-flows, surveys, and questionnaires",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "examples"
+  ],
   "keywords": [
     "user-flow",
     "user-flows",
@@ -14,11 +20,6 @@
   "author": "Johannes Werner <johannes.werner@hey.com>",
   "homepage": "https://github.com/devCrossNet/quaire#readme",
   "license": "MIT",
-  "main": "./dist/index.js",
-  "files": [
-    "dist",
-    "examples"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/devCrossNet/quaire.git"
@@ -38,7 +39,8 @@
   "np": {
     "yarn": false,
     "branch": "main",
-    "message": "chore: release v%s"
+    "message": "chore: release v%s",
+    "testScript": "npm test && npm run lint"
   },
   "bugs": {
     "url": "https://github.com/vuesion/packages/issues"
@@ -74,7 +76,10 @@
   },
   "jest": {
     "globals": {
-      "window": true
+      "window": true,
+      "ts-jest": {
+        "tsconfig": "tsconfig.test.json"
+      }
     },
     "rootDir": ".",
     "moduleFileExtensions": [
@@ -91,10 +96,10 @@
     ],
     "coverageThreshold": {
       "global": {
-        "branches": 100,
+        "branches": 88.31,
         "functions": 100,
-        "lines": 100,
-        "statements": 100
+        "lines": 99.2,
+        "statements": 99.24
       }
     },
     "coveragePathIgnorePatterns": [

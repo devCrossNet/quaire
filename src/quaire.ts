@@ -17,9 +17,9 @@ export class Quaire<
   IItem extends QuaireItem = QuaireItem,
   IQuestion extends QuaireQuestion = QuaireQuestion,
   INavigationItem extends QuaireNavigationItem = QuaireNavigationItem,
-> implements QuaireBase
+> implements QuaireBase<IQuestion, INavigationItem>
 {
-  protected _activeItemId = null;
+  protected _activeItemId: number | null = null;
   protected readonly _items: Array<IItem>;
   protected readonly _navigationItems: Array<INavigationItem>;
   protected readonly _result: Record<string, any> = {};
@@ -50,42 +50,45 @@ export class Quaire<
 
   protected _setActiveItemId() {
     let activeQuestion = this.getActiveQuestion();
-    let answer = this._result[activeQuestion.resultProperty];
 
-    if (!hasAnswer(answer)) {
-      return;
-    }
-
-    while (activeQuestion) {
-      this.saveAnswer(answer);
-
-      const currentQuestion = this.getActiveQuestion();
-
-      if (activeQuestion.id !== currentQuestion.id) {
-        activeQuestion = currentQuestion;
-
-        answer = this._result[activeQuestion.resultProperty];
-      } else {
-        activeQuestion = null;
-        answer = null;
-      }
+    if (activeQuestion) {
+      let answer = this._result[activeQuestion.resultProperty];
 
       if (!hasAnswer(answer)) {
-        break;
+        return;
+      }
+
+      while (activeQuestion) {
+        this.saveAnswer(answer);
+
+        const currentQuestion = this.getActiveQuestion();
+
+        if (currentQuestion && activeQuestion.id !== currentQuestion.id) {
+          activeQuestion = currentQuestion;
+
+          answer = this._result[activeQuestion.resultProperty];
+        } else {
+          activeQuestion = null;
+          answer = null;
+        }
+
+        if (!hasAnswer(answer)) {
+          break;
+        }
       }
     }
   }
 
-  protected _getItem(itemId: number) {
+  protected _getItem(itemId: number | undefined) {
     return this._items.find((i) => i.id === itemId);
   }
 
   protected _getQuestionObject(
     item: IItem,
     dependsOnKeys: string[],
-    selectOptions: QuaireItemOption[],
-    rangeOption: QuaireRangeItemOption,
-    inputOption: QuaireInputItemOption,
+    selectOptions: QuaireItemOption[] | null,
+    rangeOption: QuaireRangeItemOption | null,
+    inputOption: QuaireInputItemOption | null,
     defaultValue: any,
   ): IQuestion {
     const value = this._getResultByValueProperty(item.resultProperty);
@@ -139,11 +142,16 @@ export class Quaire<
     return path;
   }
 
-  protected _getQuestion(itemId: number) {
+  protected _getQuestion(itemId: number | undefined) {
     const item = this._getItem(itemId);
-    let selectOptions: Array<QuaireItemOption>;
-    let rangeOption: QuaireRangeItemOption;
-    let inputOption: QuaireInputItemOption;
+
+    if (!item) {
+      return null;
+    }
+
+    let selectOptions: Array<QuaireItemOption> | null;
+    let rangeOption: QuaireRangeItemOption | null;
+    let inputOption: QuaireInputItemOption | null;
     let defaultValue: any;
 
     if (item.dependsOnResultProperties.length > 0) {
@@ -178,7 +186,7 @@ export class Quaire<
       item = this._items.find((i) => i.navigationItemId === categoryId);
     }
 
-    return this._getQuestion(item.id);
+    return this._getQuestion(item?.id);
   }
 
   protected _getResultByValueProperty(valueProperty: string) {
@@ -186,7 +194,8 @@ export class Quaire<
   }
 
   protected _getActiveQuestionNavigationItem() {
-    return this._navigationItems.find((bc) => bc.id === this.getActiveQuestion().navigationItemId);
+    const navigationItem = this._navigationItems.find((bc) => bc.id === this.getActiveQuestion()?.navigationItemId);
+    return navigationItem || null;
   }
 
   protected _validateSelectComponent(question: IQuestion, currentAnswer: any) {
@@ -198,12 +207,12 @@ export class Quaire<
     }
   }
 
-  protected _validateRangeComponent(question: IQuestion, activeQuestion: IQuestion) {
+  protected _validateRangeComponent(question: IQuestion, activeQuestion: IQuestion | null) {
     const isActiveQuestionADependency = !!question.dependsOnQuestions.find(
-      (dq) => dq.resultProperty === activeQuestion.resultProperty,
+      (dq) => dq.resultProperty === activeQuestion?.resultProperty,
     );
 
-    if (isActiveQuestionADependency && activeQuestion.required && activeQuestion.valueHasChanged) {
+    if (isActiveQuestionADependency && activeQuestion?.required && activeQuestion.valueHasChanged) {
       delete this._result[question.resultProperty];
       this._validationErrors[question.id] = QuaireValidationError.REQUIRED;
     }
@@ -212,7 +221,7 @@ export class Quaire<
   protected _validateGenericComponent(
     isQuestionInCurrentFlow: boolean,
     question: IQuestion,
-    activeQuestion: IQuestion,
+    activeQuestion: IQuestion | null,
     currentAnswer: any,
   ) {
     if (
@@ -225,40 +234,43 @@ export class Quaire<
     }
   }
 
-  protected _validate(activeQuestion: IQuestion) {
+  protected _validate(activeQuestion: IQuestion | null) {
     this._items.forEach((item) => {
       const question = this._getQuestion(item.id);
-      const currentAnswer = this._getResultByValueProperty(question.resultProperty);
-      const possibleFollowUpQuestionIds: number[] = [];
 
-      question.dependsOnQuestions.forEach((q) => {
-        const dependsOnQuestionResult = this._result[q.resultProperty];
+      if (question) {
+        const currentAnswer = this._getResultByValueProperty(question.resultProperty);
+        const possibleFollowUpQuestionIds: number[] = [];
 
-        // only take possible follow up id's based on the current result of the dependent question
-        q.selectOptions?.forEach((o) => {
-          if (o.value === dependsOnQuestionResult) {
-            possibleFollowUpQuestionIds.push(o.nextItemId);
-          }
+        question.dependsOnQuestions.forEach((q) => {
+          const dependsOnQuestionResult = this._result[q.resultProperty];
+
+          // only take possible follow up id's based on the current result of the dependent question
+          q.selectOptions?.forEach((o) => {
+            if (o.value === dependsOnQuestionResult && o.nextItemId) {
+              possibleFollowUpQuestionIds.push(o.nextItemId);
+            }
+          });
         });
-      });
 
-      // Some components always allow a dependent question to be in the flow
-      if (this._alwaysPossibleFollowUpQuestionComponents.includes(question.componentType)) {
-        possibleFollowUpQuestionIds.push(question.id);
-      }
+        // Some components always allow a dependent question to be in the flow
+        if (this._alwaysPossibleFollowUpQuestionComponents.includes(question.componentType)) {
+          possibleFollowUpQuestionIds.push(question.id);
+        }
 
-      const isQuestionInCurrentFlow =
-        question.dependsOnQuestions.length > 0 ? possibleFollowUpQuestionIds.includes(question.id) : true;
+        const isQuestionInCurrentFlow =
+          question.dependsOnQuestions.length > 0 ? possibleFollowUpQuestionIds.includes(question.id) : true;
 
-      if (isQuestionInCurrentFlow === false) {
-        delete this._result[question.resultProperty];
-        delete this._validationErrors[question.id];
-      } else if (currentAnswer && this._selectComponentTypes.includes(question.componentType)) {
-        this._validateSelectComponent(question, currentAnswer);
-      } else if (currentAnswer && this._rangeComponentTypes.includes(question.componentType)) {
-        this._validateRangeComponent(question, activeQuestion);
-      } else {
-        this._validateGenericComponent(isQuestionInCurrentFlow, question, activeQuestion, currentAnswer);
+        if (!isQuestionInCurrentFlow) {
+          delete this._result[question.resultProperty];
+          delete this._validationErrors[question.id];
+        } else if (currentAnswer && this._selectComponentTypes.includes(question.componentType)) {
+          this._validateSelectComponent(question, currentAnswer);
+        } else if (currentAnswer && this._rangeComponentTypes.includes(question.componentType)) {
+          this._validateRangeComponent(question, activeQuestion);
+        } else {
+          this._validateGenericComponent(isQuestionInCurrentFlow, question, activeQuestion, currentAnswer);
+        }
       }
     });
   }
@@ -278,10 +290,10 @@ export class Quaire<
       const firstChildNavigationItem = this._navigationItems.find(
         (navigationItem) => navigationItem.parentId === navigationItemId,
       );
-      quaireItem = this._items.find((item) => item.navigationItemId === firstChildNavigationItem.id);
+      quaireItem = this._items.find((item) => item.navigationItemId === firstChildNavigationItem?.id);
     }
 
-    this._activeItemId = quaireItem.id;
+    this._activeItemId = quaireItem?.id || null;
   }
 
   public setActiveQuestionByQuestionId(questionId: number) {
@@ -296,55 +308,58 @@ export class Quaire<
     return null;
   }
 
-  protected _getNextItemIdFromSelectComponents = (activeQuestion: IQuestion, answer: any) => {
-    const option = activeQuestion.selectOptions.find((o) => o.value === answer);
+  protected _getNextItemIdFromSelectComponents = (activeQuestion: IQuestion | null, answer: any) => {
+    const option = activeQuestion?.selectOptions?.find((o) => o.value === answer);
     return option?.nextItemId;
   };
 
   // eslint-disable-next-line
-  protected _getNextItemIdFromRangeComponents = (activeQuestion: IQuestion, answer: any) => {
-    return activeQuestion.rangeOption.nextItemId;
+  protected _getNextItemIdFromRangeComponents = (activeQuestion: IQuestion | null, answer: any) => {
+    return activeQuestion?.rangeOption?.nextItemId;
   };
 
   // eslint-disable-next-line
-  protected _getNextItemIdFromInputComponents = (activeQuestion: IQuestion, answer: any) => {
-    return activeQuestion.inputOption.nextItemId;
+  protected _getNextItemIdFromInputComponents = (activeQuestion: IQuestion | null, answer: any) => {
+    return activeQuestion?.inputOption?.nextItemId;
   };
 
   public saveAnswer(answer: any) {
     const activeQuestion = this.getActiveQuestion();
-    let nextItemId: number;
 
-    activeQuestion.valueHasChanged = this._result[activeQuestion.resultProperty] !== answer;
+    if (activeQuestion) {
+      let nextItemId: number | null | undefined;
 
-    this._result[activeQuestion.resultProperty] = answer;
+      activeQuestion.valueHasChanged = this._result[activeQuestion.resultProperty] !== answer;
 
-    delete this._validationErrors[activeQuestion.id];
+      this._result[activeQuestion.resultProperty] = answer;
 
-    if (this._selectComponentTypes.includes(activeQuestion.componentType)) {
-      nextItemId = this._getNextItemIdFromSelectComponents(activeQuestion, answer);
-    } else if (this._rangeComponentTypes.includes(activeQuestion.componentType)) {
-      nextItemId = this._getNextItemIdFromRangeComponents(activeQuestion, answer);
-    } else if (this._inputComponentTypes.includes(activeQuestion.componentType)) {
-      nextItemId = this._getNextItemIdFromInputComponents(activeQuestion, answer);
-    } else {
-      nextItemId = activeQuestion.nextItemId;
+      delete this._validationErrors[activeQuestion.id];
+
+      if (this._selectComponentTypes.includes(activeQuestion.componentType)) {
+        nextItemId = this._getNextItemIdFromSelectComponents(activeQuestion, answer);
+      } else if (this._rangeComponentTypes.includes(activeQuestion.componentType)) {
+        nextItemId = this._getNextItemIdFromRangeComponents(activeQuestion, answer);
+      } else if (this._inputComponentTypes.includes(activeQuestion.componentType)) {
+        nextItemId = this._getNextItemIdFromInputComponents(activeQuestion, answer);
+      } else {
+        nextItemId = activeQuestion.nextItemId;
+      }
+
+      if (!nextItemId) {
+        nextItemId = activeQuestion.id;
+      }
+
+      this._activeItemId = nextItemId;
+
+      this._validate(activeQuestion);
     }
-
-    if (!nextItemId) {
-      nextItemId = activeQuestion.id;
-    }
-
-    this._activeItemId = nextItemId;
-
-    this._validate(activeQuestion);
   }
 
-  protected _getNavigationValue(question: IQuestion, answer: any): any {
-    let value: string;
+  protected _getNavigationValue(question: IQuestion | null, answer: any): any {
+    let value: string | null | undefined;
 
-    if (this._selectComponentTypes.includes(question.componentType)) {
-      value = question.selectOptions.find((selectOption) => selectOption.value === answer).label;
+    if (question && this._selectComponentTypes.includes(question.componentType)) {
+      value = question?.selectOptions?.find((selectOption) => selectOption.value === answer)?.label;
     } else {
       value = answer;
     }
@@ -353,13 +368,13 @@ export class Quaire<
   }
 
   protected _getNavigationItemObject(
-    activeNavigationItem: INavigationItem,
+    activeNavigationItem: INavigationItem | null,
     navigationItem: INavigationItem,
     question: IQuestion,
     answer: any,
     isParent: boolean,
   ): INavigationItem {
-    const active = activeNavigationItem.id === navigationItem.id;
+    const active = activeNavigationItem?.id === navigationItem.id;
     const isValid = question.isValid;
     const hasValue = Boolean(answer);
     let value: any = null;
@@ -389,35 +404,46 @@ export class Quaire<
   }
 
   protected _getNavigationItem(
-    activeNavigationItem: INavigationItem,
+    activeNavigationItem: INavigationItem | null,
     navigationItem: INavigationItem,
     isParent = true,
   ) {
     const question = this._getQuestionByNavigationItemId(navigationItem.id);
-    const answer = this._getResultByValueProperty(question.resultProperty);
 
-    return this._getNavigationItemObject(activeNavigationItem, navigationItem, question, answer, isParent);
+    if (question) {
+      const answer = this._getResultByValueProperty(question.resultProperty);
+
+      return this._getNavigationItemObject(activeNavigationItem, navigationItem, question, answer, isParent);
+    }
+
+    return null;
   }
 
   protected _addNavigationItem(
     navigationItems: { [key: string]: INavigationItem },
-    activeNavigationItem: INavigationItem,
+    activeNavigationItem: INavigationItem | null,
     navigationItem: INavigationItem,
   ) {
-    navigationItems[navigationItem.id] = this._getNavigationItem(activeNavigationItem, navigationItem);
+    const newNavigationItem = this._getNavigationItem(activeNavigationItem, navigationItem);
+
+    if (newNavigationItem) {
+      navigationItems[navigationItem.id] = newNavigationItem;
+    }
   }
 
   protected _addChildNavigationItem(
     navigationItems: { [key: string]: INavigationItem },
-    activeNavigationItem: INavigationItem,
+    activeNavigationItem: INavigationItem | null,
     navigationItem: INavigationItem,
   ) {
-    const subCategory = this._getNavigationItem(activeNavigationItem, navigationItem, false);
+    const subNavigationItem = this._getNavigationItem(activeNavigationItem, navigationItem, false);
 
-    navigationItems[navigationItem.parentId].subNavigation.push(subCategory);
-    navigationItems[navigationItem.parentId].active =
-      navigationItems[navigationItem.parentId].active || activeNavigationItem.parentId === navigationItem.parentId;
-    navigationItems[navigationItem.parentId].hasValue = true;
+    if (subNavigationItem && navigationItem.parentId) {
+      navigationItems[navigationItem.parentId]?.subNavigation?.push(subNavigationItem);
+      navigationItems[navigationItem.parentId].active =
+        navigationItems[navigationItem.parentId].active || activeNavigationItem?.parentId === navigationItem.parentId;
+      navigationItems[navigationItem.parentId].hasValue = true;
+    }
   }
 
   public getNavigation = (): INavigationItem[] => {
@@ -427,7 +453,7 @@ export class Quaire<
     this._navigationItems.forEach((navigationItem) => {
       const hasParent = Boolean(navigationItem.parentId);
 
-      if (hasParent === false) {
+      if (!hasParent) {
         this._addNavigationItem(navigationItems, activeNavigationItem, navigationItem);
       } else {
         this._addChildNavigationItem(navigationItems, activeNavigationItem, navigationItem);

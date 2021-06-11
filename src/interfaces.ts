@@ -1,14 +1,17 @@
 import { QuaireComponentType, QuaireValidationError } from './enums';
 
-export interface QuaireBase {
-  saveAnswer(answer: any);
-  getActiveQuestion(): QuaireQuestion;
+export interface QuaireBase<
+  IQuestion extends QuaireQuestion = QuaireQuestion,
+  INavigationItem extends QuaireNavigationItem = QuaireNavigationItem,
+> {
+  saveAnswer(answer: any): void;
+  getActiveQuestion(): IQuestion | null;
   getResult(): Record<string, any>;
   getValidationErrors(): Record<number, QuaireValidationError>;
-  setActiveQuestionByNavigationItemId(navigationItemId: number);
-  setActiveQuestionByQuestionId(questionId: number);
+  setActiveQuestionByNavigationItemId(navigationItemId: number): void;
+  setActiveQuestionByQuestionId(questionId: number): void;
   isValid(): boolean;
-  getNavigation(): Array<QuaireNavigationItem>;
+  getNavigation(): Array<INavigationItem>;
 }
 
 export interface QuaireOptions<
@@ -61,7 +64,7 @@ export interface QuaireNavigationItem {
   name: string;
   value?: string;
   icon?: string;
-  parentId?: number;
+  parentId?: number | null;
   active?: boolean;
   isValid?: boolean;
   hasValue?: boolean;
