@@ -34,13 +34,14 @@
     "prettier": "prettier --config=.prettierrc --ignore-path=.prettierignore --write './src/**/*.{ts,js}' './examples/**/*.{ts,js}'",
     "lint": "eslint . --ext ts,vue --fix --cache",
     "prerelease": "npm run build",
-    "release": "np"
+    "release": "np",
+    "test:release": "npm test && npm run lint && npm run prettier"
   },
   "np": {
     "yarn": false,
     "branch": "main",
     "message": "chore: release v%s",
-    "testScript": "npm test && npm run lint"
+    "testScript": "test:release"
   },
   "bugs": {
     "url": "https://github.com/vuesion/packages/issues"
