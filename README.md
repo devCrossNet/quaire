@@ -2,6 +2,16 @@
 
 a framework-agnostic library to create user-flows, surveys, and questionnaires
 
+# What type of application can I build with quaire?
+
+The library was already used for
+
+- Call center software (call scripts)
+- Surveys
+- Briefings
+- Games
+- Questionnaires
+
 # Why the name?
 
 Because I needed one and `Questionnaire` is terrible to type. Let me know if you have a better one!

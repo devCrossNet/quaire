@@ -1,6 +1,8 @@
 # Example for questions that have dependencies to answers of former questions
 
 This is an example of dependencies between possible answers for a question based on existing answers.
+That means that Question 2 has a different set of possible options based on the answer to Question 1.
+And Question 3 has different options based on the answer to Question 1 and Question 2.
 
 ```
                                                                ┌────────────┐
