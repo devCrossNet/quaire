@@ -455,13 +455,14 @@ export class Quaire<
     activeNavigationItem: NavigationItem | null,
     navigationItem: NavigationItem,
   ) {
+    const parent = navigationItems[navigationItem.parentId as number];
     const subNavigationItem = this._getNavigationItem(activeNavigationItem, navigationItem, false);
 
-    if (subNavigationItem && navigationItem.parentId) {
-      navigationItems[navigationItem.parentId]?.subNavigation?.push(subNavigationItem);
-      navigationItems[navigationItem.parentId].active =
-        navigationItems[navigationItem.parentId].active || activeNavigationItem?.parentId === navigationItem.parentId;
-      navigationItems[navigationItem.parentId].hasValue = true;
+    // ignore children with unknown parents
+    if (parent && subNavigationItem) {
+      parent.subNavigation?.push(subNavigationItem);
+      parent.active = parent.active || activeNavigationItem?.parentId === navigationItem.parentId;
+      parent.hasValue = true;
     }
   }
 
@@ -470,15 +471,18 @@ export class Quaire<
     const parentNavigationItemIds = new Set<number>();
     const activeNavigationItem = this._getActiveQuestionNavigationItem();
 
-    this._navigationItems.forEach((navigationItem) => {
-      const hasParent = Boolean(navigationItem.parentId);
-
-      if (!hasParent) {
+    // add all parents first, so children can be added independent of their position in the list
+    this._navigationItems
+      .filter((navigationItem) => !navigationItem.parentId)
+      .forEach((navigationItem) => {
         this._addNavigationItem(navigationItems, activeNavigationItem, navigationItem, parentNavigationItemIds);
-      } else {
+      });
+
+    this._navigationItems
+      .filter((navigationItem) => navigationItem.parentId)
+      .forEach((navigationItem) => {
         this._addChildNavigationItem(navigationItems, activeNavigationItem, navigationItem);
-      }
-    });
+      });
 
     parentNavigationItemIds.forEach((id) => {
       const subNavigation = navigationItems[id].subNavigation as NavigationItem[];

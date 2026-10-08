@@ -261,6 +261,24 @@ describe('Quaire', () => {
     });
   });
 
+  describe('navigation order', () => {
+    test('should add children that come before their parent', () => {
+      const [parent, ...children] = navigationItems;
+      const Q = new Quaire({ items, navigationItems: [...children, parent] });
+
+      expect(Q.getNavigation()).toEqual(new Quaire({ items, navigationItems }).getNavigation());
+    });
+
+    test('should ignore children with an unknown parent', () => {
+      const navigationItemsWithUnknownParent: Array<QuaireNavigationItem> = [
+        { id: 2, parentId: 99, name: 'Subcategory with unknown parent' },
+      ];
+      const Q = new Quaire({ items, navigationItems: navigationItemsWithUnknownParent });
+
+      expect(Q.getNavigation()).toEqual([]);
+    });
+  });
+
   describe('active question', () => {
     test('should have no active question for an unknown question ID', () => {
       const Q = new Quaire({ items });
