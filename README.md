@@ -116,6 +116,10 @@ export const navigationItems: QuaireNavigationItem[] = [
 ];
 ```
 
+A navigation item without an own question is shown only if it has children with questions.
+For a parent item, `hasValue` and `isValid` are derived from its children.
+Navigation items without any question are not shown.
+
 ## Use quaire behaviour
 
 To use the default behavior you need to initialize `Quaire` with the data you
