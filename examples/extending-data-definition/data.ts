@@ -1,52 +1,46 @@
-import { QuaireComponentType } from '../../src';
-import { MyItem, MyNavigationItem } from './MyQuaire';
+import type { QuaireNavigationDefinition, QuaireQuestionDefinition } from '../../src';
 
-export const items: Array<MyItem> = [
+// custom properties for all questions
+export type MyQuestionDefinition = QuaireQuestionDefinition & {
+  progress: number;
+  unit?: string;
+};
+
+// custom properties for all navigation items
+export type MyNavigationDefinition = QuaireNavigationDefinition & {
+  color: string;
+};
+
+export const questions: Array<MyQuestionDefinition> = [
   {
     id: 1,
-    resultProperty: 'foo',
-    navigationItemId: 1,
-    dependsOnResultProperties: [],
-    componentType: QuaireComponentType.RANGE_SLIDER,
-    question: 'Question 1',
-    description: 'Description 1',
+    type: 'RANGE',
+    key: 'foo',
+    title: 'Question 1',
+    navigationId: 1,
     required: true,
     progress: 50,
-    rangeOption: {
-      range: [1, 100],
-      divisor: 10,
-      unit: '%',
-      nextItemId: 2,
-    },
+    unit: '%',
+    min: 1,
+    max: 100,
+    next: 2,
   },
   {
     id: 2,
-    resultProperty: 'bar',
-    navigationItemId: 2,
-    dependsOnResultProperties: [],
-    componentType: QuaireComponentType.RANGE_SLIDER,
-    question: 'Question 2',
-    description: 'Description 2',
+    type: 'SINGLE_SELECT',
+    key: 'bar',
+    title: 'Question 2',
+    navigationId: 2,
     required: true,
     progress: 100,
-    rangeOption: {
-      range: [1, 5],
-      divisor: 100,
-      unit: 'km/h',
-      nextItemId: 1,
-    },
+    options: [
+      { label: 'Car', value: 'car', icon: 'car' }, // options can have custom properties, too
+      { label: 'Bike', value: 'bike', icon: 'bike' },
+    ],
   },
 ];
 
-export const navigationItems: Array<MyNavigationItem> = [
-  {
-    id: 1,
-    parentId: null,
-    name: 'Category 1',
-  },
-  {
-    id: 2,
-    parentId: 1,
-    name: 'Subcategory 1',
-  },
+export const navigation: Array<MyNavigationDefinition> = [
+  { id: 1, title: 'Category 1', color: 'blue' },
+  { id: 2, parentId: 1, title: 'Subcategory 1', color: 'green' },
 ];

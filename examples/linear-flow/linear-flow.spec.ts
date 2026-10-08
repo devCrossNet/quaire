@@ -1,74 +1,36 @@
 import { Quaire } from '../../src';
-import { items, navigationItems } from './data';
+import { navigation, questions } from './data';
 
 describe('linear-flow', () => {
   let Q: Quaire;
 
   beforeEach(() => {
-    Q = new Quaire({ items, navigationItems });
+    Q = new Quaire({ questions, navigation });
+  });
+
+  test('should go through all questions in order', () => {
+    expect(Q.getActiveQuestion().title).toBe('Question 1');
+
+    Q.saveAnswer('option 1');
+    expect(Q.getActiveQuestion().title).toBe('Question 2');
+
+    Q.saveAnswer('option 2');
+    expect(Q.getActiveQuestion().title).toBe('Question 3');
+
+    Q.saveAnswer('option 1');
+    expect(Q.getActiveQuestion().title).toBe('Question 3');
+    expect(Q.isComplete()).toBe(true);
+    expect(Q.getResult()).toEqual({ foo: 'option 1', bar: 'option 2', baz: 'option 1' });
+    expect(Q.getNavigation()).toMatchObject([
+      { id: 1, value: 'Option 1', active: false, children: [{ id: 2, value: 'Option 2', active: false }] },
+      { id: 3, value: 'Option 1', active: true, children: [] },
+    ]);
   });
 
   test('should stay on the question when the answer is not a valid option', () => {
     Q.saveAnswer('option 4');
 
-    expect(Q.getActiveQuestion().question).toBe('Question 1');
-    expect(Q.getResult()).toEqual({ foo: null });
-    expect(Q.getValidationErrors()).toEqual({ '1': 'REQUIRED', '2': 'REQUIRED', '3': 'REQUIRED' });
-  });
-
-  test('should go through all questions in order', () => {
-    let activeQuestion = Q.getActiveQuestion();
-    expect(activeQuestion.question).toBe('Question 1');
-
-    Q.saveAnswer('option 1');
-    activeQuestion = Q.getActiveQuestion();
-    expect(activeQuestion.question).toBe('Question 2');
-
-    Q.saveAnswer('option 2');
-    activeQuestion = Q.getActiveQuestion();
-    expect(activeQuestion.question).toBe('Question 3');
-
-    Q.saveAnswer('option 1');
-    activeQuestion = Q.getActiveQuestion();
-    expect(activeQuestion.question).toBe('Question 3');
-
-    expect(Q.getResult()).toEqual({
-      foo: 'option 1',
-      bar: 'option 2',
-      baz: 'option 1',
-    });
-
-    expect(Q.getNavigation()).toEqual([
-      {
-        active: false,
-        componentType: 'SINGLE_SELECT',
-        hasValue: true,
-        id: 1,
-        isValid: true,
-        name: 'Category 1',
-        value: 'Option 1',
-        subNavigation: [
-          {
-            active: false,
-            componentType: 'SINGLE_SELECT',
-            hasValue: true,
-            id: 2,
-            isValid: true,
-            name: 'Subcategory 1',
-            value: 'Option 2',
-          },
-        ],
-      },
-      {
-        active: true,
-        componentType: 'SINGLE_SELECT',
-        hasValue: true,
-        id: 3,
-        isValid: true,
-        name: 'Category 2',
-        value: 'Option 1',
-        subNavigation: [],
-      },
-    ]);
+    expect(Q.getActiveQuestion().title).toBe('Question 1');
+    expect(Q.getErrors()).toEqual({ '1': 'INVALID_OPTION' });
   });
 });

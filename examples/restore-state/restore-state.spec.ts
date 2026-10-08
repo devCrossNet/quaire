@@ -1,161 +1,49 @@
 import { Quaire } from '../../src';
-import { items, navigationItems } from '../dependencies-between-questions/data';
+import { navigation, questions } from '../dependencies-between-questions/data';
 
 describe('restore-state', () => {
   test('should restore the state from a complete result', () => {
     const Q = new Quaire({
-      items,
-      navigationItems,
+      questions,
+      navigation,
       result: { foo: 'option 1', bar: 'option 1.2', baz: 'option 1.2.1' },
     });
 
-    expect(Q.getActiveQuestion().selectOptions).toEqual([
-      {
-        label: 'Option 1.2.1',
-        value: 'option 1.2.1',
-      },
-      {
-        label: 'Option 1.2.2',
-        value: 'option 1.2.2',
-      },
-    ]);
-    expect(Q.getResult()).toEqual({
-      foo: 'option 1',
-      bar: 'option 1.2',
-      baz: 'option 1.2.1',
-    });
-    expect(Q.getNavigation()).toEqual([
-      {
-        active: false,
-        componentType: 'SINGLE_SELECT',
-        hasValue: true,
-        id: 1,
-        isValid: true,
-        name: 'Category 1',
-        subNavigation: [
-          {
-            active: false,
-            componentType: 'SINGLE_SELECT',
-            hasValue: true,
-            id: 2,
-            isValid: true,
-            name: 'Subcategory 1',
-            value: 'Option 1.2',
-          },
-        ],
-        value: 'Option 1',
-      },
-      {
-        active: true,
-        componentType: 'SINGLE_SELECT',
-        hasValue: true,
-        id: 3,
-        isValid: true,
-        name: 'Category 2',
-        subNavigation: [],
-        value: 'Option 1.2.1',
-      },
+    expect(Q.getActiveQuestion().title).toBe('Question 3');
+    expect(Q.isComplete()).toBe(true);
+    expect(Q.getNavigation()).toMatchObject([
+      { id: 1, value: 'Option 1', children: [{ id: 2, value: 'Option 1.2' }] },
+      { id: 3, value: 'Option 1.2.1', active: true },
     ]);
   });
 
-  test('should restore the state from a partial result', () => {
-    const Q = new Quaire({ items, navigationItems, result: { foo: 'option 1', bar: 'option 1.2' } });
+  test('should continue with the first open question of a partial result', () => {
+    const Q = new Quaire({ questions, navigation, result: { foo: 'option 1', bar: 'option 1.2' } });
 
-    expect(Q.getActiveQuestion().selectOptions).toEqual([
-      {
-        label: 'Option 1.2.1',
-        value: 'option 1.2.1',
-      },
-      {
-        label: 'Option 1.2.2',
-        value: 'option 1.2.2',
-      },
-    ]);
-    expect(Q.getResult()).toEqual({
-      foo: 'option 1',
-      bar: 'option 1.2',
+    expect(Q.getActiveQuestion()).toMatchObject({
+      title: 'Question 3',
+      options: [
+        { label: 'Option 1.2.1', value: 'option 1.2.1' },
+        { label: 'Option 1.2.2', value: 'option 1.2.2' },
+      ],
     });
-    expect(Q.getNavigation()).toEqual([
-      {
-        active: false,
-        componentType: 'SINGLE_SELECT',
-        hasValue: true,
-        id: 1,
-        isValid: true,
-        name: 'Category 1',
-        subNavigation: [
-          {
-            active: false,
-            componentType: 'SINGLE_SELECT',
-            hasValue: true,
-            id: 2,
-            isValid: true,
-            name: 'Subcategory 1',
-            value: 'Option 1.2',
-          },
-        ],
-        value: 'Option 1',
-      },
-      {
-        active: true,
-        componentType: 'SINGLE_SELECT',
-        hasValue: false,
-        id: 3,
-        isValid: false,
-        name: 'Category 2',
-        subNavigation: [],
-        value: null,
-      },
-    ]);
+    expect(Q.canGoBack()).toBe(true);
+
+    Q.back();
+    expect(Q.getActiveQuestion().title).toBe('Question 2');
+  });
+
+  test('should continue with an invalid answer', () => {
+    const Q = new Quaire({ questions, navigation, result: { foo: 'option 1', bar: 'option 2.1' } });
+
+    expect(Q.getActiveQuestion().title).toBe('Question 2');
+    expect(Q.getActiveQuestion().error).toBe('INVALID_OPTION');
   });
 
   test('should start at question 1 with an empty result', () => {
-    const Q = new Quaire({ items, navigationItems, result: {} });
+    const Q = new Quaire({ questions, navigation, result: {} });
 
-    expect(Q.getActiveQuestion().selectOptions).toEqual([
-      {
-        label: 'Option 1',
-        nextItemId: 2,
-        value: 'option 1',
-      },
-      {
-        label: 'Option 2',
-        nextItemId: 2,
-        value: 'option 2',
-      },
-    ]);
-    expect(Q.getResult()).toEqual({});
-    expect(Q.getNavigation()).toEqual([
-      {
-        active: true,
-        componentType: 'SINGLE_SELECT',
-        hasValue: false,
-        id: 1,
-        isValid: false,
-        name: 'Category 1',
-        subNavigation: [
-          {
-            active: false,
-            componentType: 'SINGLE_SELECT',
-            hasValue: false,
-            id: 2,
-            isValid: false,
-            name: 'Subcategory 1',
-            value: null,
-          },
-        ],
-        value: null,
-      },
-      {
-        active: false,
-        componentType: 'SINGLE_SELECT',
-        hasValue: false,
-        id: 3,
-        isValid: false,
-        name: 'Category 2',
-        subNavigation: [],
-        value: null,
-      },
-    ]);
+    expect(Q.getActiveQuestion().title).toBe('Question 1');
+    expect(Q.canGoBack()).toBe(false);
   });
 });

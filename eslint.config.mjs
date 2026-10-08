@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint';
 
 export default defineConfig(
   {
-    ignores: ['**/.github/**', '**/coverage/**', '**/dist/**', '**/node_modules/**', 'commitlint.config.mjs'],
+    ignores: ['**/.claude/**', '**/.github/**', '**/coverage/**', '**/dist/**', '**/node_modules/**', 'commitlint.config.mjs'],
   },
   eslint.configs.recommended,
   tseslint.configs.recommended,
@@ -26,6 +26,7 @@ export default defineConfig(
         { selector: 'typeLike', format: ['PascalCase'], custom: { regex: '^I[A-Z]', match: false } },
       ],
       '@typescript-eslint/no-require-imports': 0,
+      '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true, argsIgnorePattern: '^_' }],
       'no-async-promise-executor': 0,
       'no-prototype-builtins': 0,
     },
