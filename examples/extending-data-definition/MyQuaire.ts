@@ -8,25 +8,25 @@ import {
   QuaireRangeItemOption,
 } from '../../src';
 
-export interface MyRangeItemOption extends QuaireRangeItemOption {
+export type MyRangeItemOption = QuaireRangeItemOption & {
   divisor: number;
   unit: string;
-}
+};
 
-export interface MyItem extends QuaireItem {
+export type MyItem = QuaireItem & {
   progress: number;
   rangeOption: MyRangeItemOption;
-}
+};
 
-export interface MyQuestion extends QuaireQuestion {
+export type MyQuestion = QuaireQuestion & {
   progress: number;
   rangeOption: MyRangeItemOption;
-}
+};
 
-export interface MyNavigationItem extends QuaireNavigationItem {
+export type MyNavigationItem = QuaireNavigationItem & {
   progress?: number;
   unit?: string;
-}
+};
 
 export class MyQuaire extends Quaire<MyItem, MyQuestion, MyNavigationItem> {
   protected _getQuestionObject(
@@ -35,7 +35,7 @@ export class MyQuaire extends Quaire<MyItem, MyQuestion, MyNavigationItem> {
     selectOptions: QuaireItemOption[],
     rangeOption: QuaireRangeItemOption,
     inputOption: QuaireInputItemOption,
-    defaultValue: any,
+    defaultValue: unknown,
   ): MyQuestion {
     return {
       ...super._getQuestionObject(item, dependsOnKeys, selectOptions, rangeOption, inputOption, defaultValue),
@@ -47,8 +47,8 @@ export class MyQuaire extends Quaire<MyItem, MyQuestion, MyNavigationItem> {
     activeNavigationItem: MyNavigationItem,
     navigationItem: MyNavigationItem,
     question: MyQuestion,
-    answer: any,
-    isParent,
+    answer: unknown,
+    isParent: boolean,
   ): MyNavigationItem {
     return {
       ...super._getNavigationItemObject(activeNavigationItem, navigationItem, question, answer, isParent),

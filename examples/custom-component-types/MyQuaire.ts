@@ -32,7 +32,7 @@ export class MyQuaire extends Quaire {
   }
 
   // override default behaviour and apply new logic for MULTI_SELECT components
-  protected _validateSelectComponent(question: QuaireQuestion, currentAnswer: any[]) {
+  protected _validateSelectComponent(question: QuaireQuestion, currentAnswer: unknown[]) {
     if (question.componentType === MyComponentType.MULTI_SELECT) {
       const options = question.selectOptions.filter((o) => currentAnswer.includes(o.value));
 
@@ -46,7 +46,7 @@ export class MyQuaire extends Quaire {
   }
 
   // override default behaviour and apply new logic for MULTI_SELECT components
-  protected _getNextItemIdFromSelectComponents = (activeQuestion: QuaireQuestion, answer: any | any[]) => {
+  protected _getNextItemIdFromSelectComponents = (activeQuestion: QuaireQuestion, answer: unknown) => {
     const option = activeQuestion.selectOptions.find((o) =>
       Array.isArray(answer) ? answer.includes(o.value) : o.value === answer,
     );
@@ -72,10 +72,12 @@ export class MyQuaire extends Quaire {
   }
 
   // override default behaviour and apply new logic for MULTI_SELECT components
-  protected _getNavigationValue(question: QuaireQuestion, answer: any) {
+  protected _getNavigationValue(question: QuaireQuestion, answer: unknown) {
     if (question.componentType === MyComponentType.MULTI_SELECT) {
+      const answers = answer as unknown[];
+
       return question.selectOptions
-        .filter((selectOption) => answer.includes(selectOption.value))
+        .filter((selectOption) => answers.includes(selectOption.value))
         .map((selectOption) => selectOption.label);
     } else {
       return super._getNavigationValue(question, answer);

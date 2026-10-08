@@ -1,13 +1,16 @@
-export const isNil = (value: any) => value === null || value === undefined;
+export const isNil = (value: unknown): value is null | undefined => value === null || value === undefined;
 
-export const hasAnswer = (answer: any) => (Array.isArray(answer) ? answer.length > 0 : isNil(answer) === false);
+export const hasAnswer = (answer: unknown) => (Array.isArray(answer) ? answer.length > 0 : isNil(answer) === false);
 
-export const getByPath = (object: any, path: Array<string>, defaultValue: any = undefined) => {
+export const getByPath = <T>(object: unknown, path: Array<string>, defaultValue: T): T => {
   if (path.length === 0) {
     return defaultValue;
   }
 
-  const value = path.reduce((current, key) => (isNil(current) ? undefined : current[key]), object);
+  const value = path.reduce<unknown>(
+    (current, key) => (isNil(current) ? undefined : (current as Record<string, unknown>)[key]),
+    object,
+  );
 
-  return value === undefined ? defaultValue : value;
+  return value === undefined ? defaultValue : (value as T);
 };
