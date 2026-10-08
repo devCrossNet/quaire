@@ -106,4 +106,4 @@ dist
 # Webstorm
 .idea
 
-.claude/plans
+.claude/plans*
