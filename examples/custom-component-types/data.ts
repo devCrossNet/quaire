@@ -1,102 +1,45 @@
-import { QuaireComponentType, QuaireItem, QuaireNavigationItem } from '../../src';
-import { MyComponentType } from './MyQuaire';
+import type { QuaireNavigationDefinition } from '../../src';
+import type { MyQuestionDefinition } from './rating';
 
-export const items: Array<QuaireItem> = [
+export const questions: Array<MyQuestionDefinition> = [
   {
     id: 1,
-    resultProperty: 'foo',
-    navigationItemId: 1,
-    dependsOnResultProperties: [],
-    componentType: QuaireComponentType.SINGLE_SELECT,
-    question: 'Question 1',
-    description: 'Description 1',
+    type: 'RATING',
+    key: 'rating',
+    title: 'How do you like quaire?',
+    navigationId: 1,
     required: true,
-    selectOptions: [
-      {
-        label: 'Option 1',
-        value: 'option 1',
-        nextItemId: 2,
-      },
-      {
-        label: 'Option 2',
-        value: 'option 2',
-        nextItemId: 2,
-      },
-    ],
+    stars: 5,
+    next: [{ when: { rating: { lte: 2 } }, to: 2 }, { to: 3 }],
   },
   {
     id: 2,
-    resultProperty: 'bar',
-    navigationItemId: 2,
-    dependsOnResultProperties: ['foo'],
-    componentType: MyComponentType.MULTI_SELECT,
-    question: 'Question 2',
-    description: 'Description 2',
+    type: 'MULTI_SELECT',
+    key: 'improvements',
+    title: 'What can we improve?',
+    navigationId: 2,
     required: true,
-    selectOptions: {
-      foo: {
-        'option 1': [
-          {
-            label: 'Option 1',
-            value: 'option 1',
-            nextItemId: 3,
-          },
-          {
-            label: 'Option 2',
-            value: 'option 2',
-            nextItemId: 3,
-          },
-        ],
-        'option 2': [
-          {
-            label: 'Option 3',
-            value: 'option 3',
-            nextItemId: 3,
-          },
-          {
-            label: 'Option 4',
-            value: 'option 4',
-            nextItemId: 3,
-          },
-        ],
-      },
-    },
+    options: [
+      { label: 'Documentation', value: 'docs' },
+      { label: 'Performance', value: 'performance' },
+      { label: 'API', value: 'api' },
+    ],
+    next: 3,
   },
   {
     id: 3,
-    resultProperty: 'baz',
-    navigationItemId: 3,
-    dependsOnResultProperties: ['bar'],
-    componentType: MyComponentType.BOOLEAN,
-    question: 'Question 3',
-    description: 'Description 3',
+    type: 'BOOLEAN',
+    key: 'recommend',
+    title: 'Would you recommend quaire?',
+    navigationId: 3,
     required: true,
-    nextItemId: 1,
-    defaultValue: {
-      bar: {
-        'option 1_option 2': true,
-        'option 3_option 4': false,
-        'option 1': false,
-        'option 2': false,
-      },
-    },
+    trueLabel: 'Yes',
+    falseLabel: 'No',
   },
 ];
 
-export const navigationItems: Array<QuaireNavigationItem> = [
-  {
-    id: 1,
-    parentId: null,
-    name: 'Category 1',
-  },
-  {
-    id: 2,
-    parentId: 1,
-    name: 'Subcategory 1',
-  },
-  {
-    id: 3,
-    parentId: null,
-    name: 'Category 2',
-  },
+export const navigation: Array<QuaireNavigationDefinition> = [
+  { id: 1, title: 'Rating' },
+  { id: 2, parentId: 1, title: 'Improvements' },
+  { id: 3, title: 'Recommendation' },
 ];

@@ -1,97 +1,50 @@
-import { QuaireComponentType, QuaireItem, QuaireNavigationItem } from '../../src';
+import type { QuaireNavigationDefinition, QuaireQuestionDefinition } from '../../src';
 
-export const items: Array<QuaireItem> = [
+export const questions: Array<QuaireQuestionDefinition> = [
   {
     id: 1,
-    resultProperty: 'name',
-    navigationItemId: 2,
-    dependsOnResultProperties: [],
-    componentType: QuaireComponentType.INPUT,
-    question: 'What is your name?',
-    description: '',
+    type: 'INPUT',
+    key: 'name',
+    title: 'What is your name?',
+    navigationId: 2,
     required: true,
-    inputOption: {
-      type: 'text',
-      nextItemId: 2,
-    },
+    next: 2,
   },
   {
     id: 2,
-    resultProperty: 'age',
-    navigationItemId: 3,
-    dependsOnResultProperties: [],
-    componentType: QuaireComponentType.INPUT,
-    question: 'How old are you?',
-    description: '',
-    required: false,
-    inputOption: {
-      type: 'number',
-      nextItemId: 3,
-    },
+    type: 'INPUT',
+    key: 'age',
+    title: 'How old are you?',
+    navigationId: 3,
+    inputType: 'number',
+    next: 3,
   },
   {
     id: 3,
-    resultProperty: 'contact',
-    navigationItemId: 4,
-    dependsOnResultProperties: [],
-    componentType: QuaireComponentType.SINGLE_SELECT,
-    question: 'How should we contact you?',
-    description: '',
+    type: 'SINGLE_SELECT',
+    key: 'contact',
+    title: 'How should we contact you?',
+    navigationId: 4,
     required: true,
-    selectOptions: [
-      {
-        label: 'E-Mail',
-        value: 'email',
-        nextItemId: 4,
-      },
-      {
-        label: 'Phone',
-        value: 'phone',
-        nextItemId: 4,
-      },
+    options: [
+      { label: 'E-Mail', value: 'email', next: 4 },
+      { label: 'Phone', value: 'phone', next: 4 },
     ],
   },
   {
     id: 4,
-    resultProperty: 'contactDetails',
-    navigationItemId: 5,
-    dependsOnResultProperties: [],
-    componentType: QuaireComponentType.INPUT,
-    question: 'Where can we reach you?',
-    description: '',
+    type: 'INPUT',
+    key: 'contactDetails',
+    title: 'Where can we reach you?',
+    navigationId: 5,
     required: true,
-    inputOption: {
-      type: 'text',
-    },
   },
 ];
 
-export const navigationItems: Array<QuaireNavigationItem> = [
-  {
-    id: 1,
-    parentId: null,
-    name: 'Personal', // has no own question, only children
-    icon: 'user',
-  },
-  {
-    id: 2,
-    parentId: 1,
-    name: 'Name',
-  },
-  {
-    id: 3,
-    parentId: 1,
-    name: 'Age',
-  },
-  {
-    id: 4,
-    parentId: null,
-    name: 'Contact', // has an own question and children
-    icon: 'phone',
-  },
-  {
-    id: 5,
-    parentId: 4,
-    name: 'Details',
-  },
+export const navigation: Array<QuaireNavigationDefinition> = [
+  { id: 1, title: 'Personal', icon: 'user' }, // has no own question, only children
+  { id: 2, parentId: 1, title: 'Name' },
+  { id: 3, parentId: 1, title: 'Age' },
+  { id: 4, title: 'Contact', icon: 'phone' }, // has an own question and children
+  { id: 5, parentId: 4, title: 'Details' },
 ];

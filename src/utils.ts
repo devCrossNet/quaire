@@ -1,16 +1,16 @@
+import type { QuaireId } from './types.js';
+
 export const isNil = (value: unknown): value is null | undefined => value === null || value === undefined;
 
-export const hasAnswer = (answer: unknown) => (Array.isArray(answer) ? answer.length > 0 : isNil(answer) === false);
-
-export const getByPath = <T>(object: unknown, path: Array<string>, defaultValue: T): T => {
-  if (path.length === 0) {
-    return defaultValue;
+// default check if a question has an answer, false and 0 are answers
+export const hasValue = (value: unknown) => {
+  if (isNil(value) || value === '') {
+    return false;
   }
 
-  const value = path.reduce<unknown>(
-    (current, key) => (isNil(current) ? undefined : (current as Record<string, unknown>)[key]),
-    object,
-  );
-
-  return value === undefined ? defaultValue : (value as T);
+  return Array.isArray(value) ? value.length > 0 : true;
 };
+
+// ids can be strings or numbers, e.g. from a CMS, so 1 and '1' are the same id
+export const isSameId = (a: QuaireId | null | undefined, b: QuaireId | null | undefined) =>
+  !isNil(a) && !isNil(b) && String(a) === String(b);

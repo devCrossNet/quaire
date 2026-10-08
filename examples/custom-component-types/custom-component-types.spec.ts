@@ -1,201 +1,43 @@
-import { items, navigationItems } from './data';
-import { MyComponentType, MyQuaire } from './MyQuaire';
+import { Quaire, validateDefinition } from '../../src';
+import { navigation, questions } from './data';
+import { MyQuestionDefinition, rating } from './rating';
 
 describe('custom-component-types', () => {
-  let Q: MyQuaire;
+  let Q: Quaire<object, MyQuestionDefinition>;
 
   beforeEach(() => {
-    Q = new MyQuaire({ items, navigationItems });
+    Q = new Quaire({ questions, navigation, components: { RATING: rating } });
   });
 
-  const answerAllQuestionsWithOption1 = () => {
-    Q.saveAnswer('option 1');
-    Q.saveAnswer(['option 2', 'option 1']);
+  test('should have a valid definition', () => {
+    expect(validateDefinition({ questions, navigation, components: { RATING: rating } })).toEqual([]);
+  });
+
+  test('should validate the custom component', () => {
+    Q.saveAnswer(6);
+
+    expect(Q.getActiveQuestion().error).toBe('INVALID_RATING');
+  });
+
+  test('should ask for improvements after a bad rating', () => {
+    Q.saveAnswer(2);
+    expect(Q.getActiveQuestion().type).toBe('MULTI_SELECT');
+
+    Q.saveAnswer(['docs', 'api']);
     Q.saveAnswer(true);
-  };
 
-  test('should go through MULTI_SELECT and BOOLEAN questions', () => {
-    let activeQuestion = Q.getActiveQuestion();
-    expect(activeQuestion.question).toBe('Question 1');
-
-    Q.saveAnswer('option 1');
-    activeQuestion = Q.getActiveQuestion();
-    expect(activeQuestion.question).toBe('Question 2');
-    expect(activeQuestion.componentType).toBe(MyComponentType.MULTI_SELECT);
-    expect(activeQuestion.selectOptions).toEqual([
-      {
-        label: 'Option 1',
-        nextItemId: 3,
-        value: 'option 1',
-      },
-      {
-        label: 'Option 2',
-        nextItemId: 3,
-        value: 'option 2',
-      },
-    ]);
-
-    Q.saveAnswer(['option 2', 'option 1']);
-    activeQuestion = Q.getActiveQuestion();
-
-    expect(activeQuestion.question).toBe('Question 3');
-    expect(activeQuestion.componentType).toBe(MyComponentType.BOOLEAN);
-    expect(activeQuestion.defaultValue).toBe(true);
-
-    Q.saveAnswer(activeQuestion.defaultValue);
-    activeQuestion = Q.getActiveQuestion();
-    expect(activeQuestion.question).toBe('Question 1');
-
-    expect(Q.getResult()).toEqual({
-      foo: 'option 1',
-      bar: ['option 1', 'option 2'],
-      baz: true,
-    });
-    expect(Q.getNavigation()).toEqual([
-      {
-        active: true,
-        componentType: 'SINGLE_SELECT',
-        hasValue: true,
-        id: 1,
-        isValid: true,
-        name: 'Category 1',
-        subNavigation: [
-          {
-            active: false,
-            componentType: 'MULTI_SELECT',
-            hasValue: true,
-            id: 2,
-            isValid: true,
-            name: 'Subcategory 1',
-            value: ['Option 1', 'Option 2'],
-          },
-        ],
-        value: 'Option 1',
-      },
-      {
-        active: false,
-        componentType: 'BOOLEAN',
-        hasValue: true,
-        id: 3,
-        isValid: true,
-        name: 'Category 2',
-        subNavigation: [],
-        value: true,
-      },
+    expect(Q.isComplete()).toBe(true);
+    expect(Q.getNavigation()).toMatchObject([
+      { id: 1, value: '2 / 5', children: [{ id: 2, value: ['Documentation', 'API'] }] },
+      { id: 3, value: 'Yes' },
     ]);
   });
 
-  test('should reset the MULTI_SELECT answer when the first answer changes', () => {
-    answerAllQuestionsWithOption1();
+  test('should skip the improvements after a good rating', () => {
+    Q.saveAnswer(5);
+    expect(Q.getActiveQuestion().type).toBe('BOOLEAN');
 
-    Q.saveAnswer('option 2');
-    const activeQuestion = Q.getActiveQuestion();
-    expect(activeQuestion.question).toBe('Question 2');
-    expect(activeQuestion.componentType).toBe(MyComponentType.MULTI_SELECT);
-    expect(activeQuestion.selectOptions).toEqual([
-      {
-        label: 'Option 3',
-        nextItemId: 3,
-        value: 'option 3',
-      },
-      {
-        label: 'Option 4',
-        nextItemId: 3,
-        value: 'option 4',
-      },
-    ]);
-    expect(Q.getResult()).toEqual({
-      foo: 'option 2',
-      bar: null,
-      baz: true,
-    });
-    expect(Q.getNavigation()).toEqual([
-      {
-        active: true,
-        componentType: 'SINGLE_SELECT',
-        hasValue: true,
-        id: 1,
-        isValid: true,
-        name: 'Category 1',
-        subNavigation: [
-          {
-            active: true,
-            componentType: 'MULTI_SELECT',
-            hasValue: false,
-            id: 2,
-            isValid: false,
-            name: 'Subcategory 1',
-            value: null,
-          },
-        ],
-        value: 'Option 2',
-      },
-      {
-        active: false,
-        componentType: 'BOOLEAN',
-        hasValue: true,
-        id: 3,
-        isValid: true,
-        name: 'Category 2',
-        subNavigation: [],
-        value: true,
-      },
-    ]);
-  });
-
-  test('should only accept MULTI_SELECT options that match the first answer', () => {
-    answerAllQuestionsWithOption1();
-    Q.saveAnswer('option 2');
-
-    Q.saveAnswer('option 1');
-    let activeQuestion = Q.getActiveQuestion();
-    expect(activeQuestion.question).toBe('Question 2');
-
-    Q.saveAnswer(['option 3', 'option 4']);
-    activeQuestion = Q.getActiveQuestion();
-    expect(activeQuestion.question).toBe('Question 3');
-    expect(activeQuestion.defaultValue).toBe(false);
-
-    Q.saveAnswer(activeQuestion.defaultValue);
-    activeQuestion = Q.getActiveQuestion();
-    expect(activeQuestion.question).toBe('Question 1');
-
-    expect(Q.getResult()).toEqual({
-      foo: 'option 2',
-      bar: ['option 3', 'option 4'],
-      baz: false,
-    });
-    expect(Q.getNavigation()).toEqual([
-      {
-        active: true,
-        componentType: 'SINGLE_SELECT',
-        hasValue: true,
-        id: 1,
-        isValid: true,
-        name: 'Category 1',
-        subNavigation: [
-          {
-            active: false,
-            componentType: 'MULTI_SELECT',
-            hasValue: true,
-            id: 2,
-            isValid: true,
-            name: 'Subcategory 1',
-            value: ['Option 3', 'Option 4'],
-          },
-        ],
-        value: 'Option 2',
-      },
-      {
-        active: false,
-        componentType: 'BOOLEAN',
-        hasValue: false,
-        id: 3,
-        isValid: false,
-        name: 'Category 2',
-        subNavigation: [],
-        value: null,
-      },
-    ]);
+    Q.saveAnswer(false);
+    expect(Q.getResult()).toEqual({ rating: 5, recommend: false });
   });
 });
