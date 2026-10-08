@@ -2,15 +2,23 @@
   "name": "quaire",
   "description": "a framework-agnostic library to create user-flows, surveys, and questionnaires",
   "version": "0.1.0",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
     },
     "./package.json": "./package.json"
   },
+  "sideEffects": false,
   "files": [
     "dist"
   ],
@@ -31,7 +39,7 @@
     "url": "git+https://github.com/devCrossNet/quaire.git"
   },
   "scripts": {
-    "compile": "tsc",
+    "compile": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json && node scripts/write-dist-package-files.mjs",
     "prebuild": "npm run clean",
     "build": "npm run compile",
     "clean": "rimraf ./dist ./coverage",
