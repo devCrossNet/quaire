@@ -20,7 +20,11 @@ export default defineConfig(
       },
     },
     rules: {
-      '@typescript-eslint/no-explicit-any': 0,
+      '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+      '@typescript-eslint/naming-convention': [
+        'error',
+        { selector: 'typeLike', format: ['PascalCase'], custom: { regex: '^I[A-Z]', match: false } },
+      ],
       '@typescript-eslint/no-require-imports': 0,
       'no-async-promise-executor': 0,
       'no-prototype-builtins': 0,

@@ -65,7 +65,7 @@ npm i --save quaire
 ## Define quaire data
 
 First you need to define the data (decision tree) based on the
-[QuaireItem interface](https://github.com/devCrossNet/quaire/blob/main/src/interfaces.ts#L43). This can be static
+[QuaireItem type](https://github.com/devCrossNet/quaire/blob/main/src/types.ts#L46). This can be static
 data in a JS/TS file, a JSON file that you load on demand
 or a dynamic JSON from a CMS or backend API.
 

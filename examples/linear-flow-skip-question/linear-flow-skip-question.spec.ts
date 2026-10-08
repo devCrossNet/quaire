@@ -2,7 +2,7 @@ import { NO_VALUE, Quaire } from '../../src';
 import { items, navigationItems } from './data';
 
 describe('linear-flow-skip-question', () => {
-  let Q;
+  let Q: Quaire;
 
   beforeEach(() => {
     Q = new Quaire({ items, navigationItems });

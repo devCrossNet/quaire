@@ -4,7 +4,7 @@ describe('getByPath', () => {
   const object = { a: { b: [{ c: 'value' }] } };
 
   test('should return the value at the path', () => {
-    expect(getByPath(object, ['a', 'b', '0', 'c'])).toBe('value');
+    expect(getByPath(object, ['a', 'b', '0', 'c'], null)).toBe('value');
   });
 
   test('should return the default value for a missing path', () => {
