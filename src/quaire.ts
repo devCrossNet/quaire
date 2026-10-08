@@ -254,7 +254,7 @@ export class Quaire<
         });
       });
 
-      // Some components always allow a dependent question to be in the flow
+      // questions with some components always stay in the flow, even if they depend on former answers
       if (this._alwaysPossibleFollowUpQuestionComponents.includes(question.componentType)) {
         possibleFollowUpQuestionIds.push(question.id);
       }

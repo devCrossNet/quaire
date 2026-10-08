@@ -18,8 +18,8 @@ export class MyQuaire extends Quaire {
     QuaireComponentType.SINGLE_SELECT,
     MyComponentType.MULTI_SELECT,
   ];
-  // these components always allow a dependent question to be in the flow
-  // e.g. a follow up question that depends on a BOOLEAN component question will always be in the flow
+  // questions with these components always stay in the flow, even if they depend on former answers
+  // e.g. a BOOLEAN question that depends on a MULTI_SELECT answer is never removed from the flow
   protected readonly _alwaysPossibleFollowUpQuestionComponents: Array<string> = [
     QuaireComponentType.RANGE_SLIDER,
     QuaireComponentType.INPUT,

@@ -1,10 +1,14 @@
 # quaire
 
-a framework-agnostic library to create user-flows, surveys, and questionnaires
+A framework-agnostic library to create user flows, surveys, and questionnaires.
 
-# What type of application can I build with quaire?
+You describe the flow as data (a decision tree). quaire takes care of the behavior:
+which question comes next, which answers are valid, and what the navigation looks like.
+You only build the view.
 
-The library was already used for
+# What can I build with quaire?
+
+The library is already used for:
 
 - Call center software (call scripts)
 - Surveys
@@ -14,190 +18,266 @@ The library was already used for
 
 # Why the name?
 
-Because I needed one and `Questionnaire` is terrible to type. Let me know if you have a better one!
+Because I needed one, and `Questionnaire` is hard to type. Let me know if you have a better one!
 
-# What use-case does it try to solve?
+# What problem does it solve?
 
-I have to implement more and more features that behave like questionnaires or surveys.
-Over the years I tried a couple of things to make it easier for me to implement those features.
+I often have to build features that behave like questionnaires or surveys.
+Over the years, I tried a few things to make this easier.
 
-Of course, the first approach I tried was to implement a static user flow, for example:
+The first approach was a static user flow, for example:
 
-- present first question on first page
-- user selects option a
+- show the first question on the first page
+- the user selects option A
 - navigate to the next question
 - etc.
 
-That was ok as long as I didn't have to change the flow but when I had to change the flow,
-I found myself changing big parts of the implementation.
+This worked well until the flow changed. Then I had to change big parts of the implementation.
 
-I also tried to use finite state machines,
-but I ended up with spaghetti state machines most of the time
-due to regular changes in the user-flow (re-arranging questions, adding questions, skip questions, etc.)
+I also tried finite state machines, but most of the time I ended up with spaghetti state machines,
+because the flow changed often (questions were re-arranged, added, skipped, etc.).
 
-The solution I found to work best for me was a concept of game-development called decision-tree.
-That way the whole user-flow is based on a static data structure that can be changed without the need of changing
-the view or the behaviour. This pattern provides a nice separation of:
+The solution that worked best for me is a concept from game development: the decision tree.
+The whole user flow is a static data structure. You can change it without changing the view or the behavior.
+This gives you a clean separation of:
 
 - data
-- behaviour
+- behavior
 - presentation
 
-# Features?
+# Features
 
-- Framework-agnostic
-- View independent
-- [Linear user-flow](https://github.com/devCrossNet/quaire/tree/main/examples/linear-flow)
-- [Branched/merged user-flow](https://github.com/devCrossNet/quaire/tree/main/examples/branched-and-merged-flow)
-- [Loops](https://github.com/devCrossNet/quaire/tree/main/examples/linear-flow-with-loop)
-- [Dependencies between questions and validation](https://github.com/devCrossNet/quaire/tree/main/examples/dependencies-between-questions)
-- [Re-storing state of the questionnaire from the selected answers](https://github.com/devCrossNet/quaire/blob/main/examples/restore-state.spec.ts)
-- Navigation
+- Framework-agnostic and view-independent
+- Written in TypeScript, types included
+- No runtime dependencies
+- Linear flows, branches, merges, and loops
+- Optional questions that can be skipped
+- Options that depend on former answers
+- Validation that resets answers when they are no longer valid
+- Navigation with categories and subcategories
+- Restore the state from an existing result
+- Typed result
+- Extensible with custom component types and custom data
 
-# How does it work?
-
-## Installation
+# Installation
 
 ```shell
-npm i --save quaire
+npm i quaire
 ```
 
-## Define quaire data
+# Getting started
 
-First you need to define the data (decision tree) based on the
-[QuaireItem type](https://github.com/devCrossNet/quaire/blob/main/src/types.ts#L46). This can be static
-data in a JS/TS file, a JSON file that you load on demand
-or a dynamic JSON from a CMS or backend API.
+## 1. Define the questions
 
-The structure for questions looks as follows:
+The questions are a list of [QuaireItem](https://github.com/devCrossNet/quaire/blob/main/src/types.ts) objects.
+This can be static data in a JS/TS file, a JSON file that you load on demand,
+or JSON from a CMS or backend API.
 
-```js
-import { QuaireComponentType, QuaireItem, QuaireNavigationItem } from 'quaire';
+```ts
+import { QuaireComponentType, QuaireItem } from 'quaire';
 
 export const items: QuaireItem[] = [
   {
     id: 1,
-    resultProperty: 'foo', // property that is used to save the answer
-    navigationItemId: 1, // association with the navigation entry (optional)
-    dependsOnResultProperties: [], // dependencies on answers from former questions, based on the result property - not question ID
-    componentType: QuaireComponentType.SINGLE_SELECT, // component type as indication for custom presentation logic
+    resultProperty: 'foo', // property in the result that stores the answer
+    navigationItemId: 1, // navigation entry of this question (optional)
+    dependsOnResultProperties: [], // result properties of former questions that change the options (see below)
+    componentType: QuaireComponentType.SINGLE_SELECT, // tells your view which component to render
     question: 'Question 1',
     description: 'Description 1',
     required: true,
-    selectOptions: [], // options for select components (optional)
-    rangeOption: {}, // option for range components (optional)
-    inputOption: {}, // option for input components (optional)
-    defaultValue: {}, // default value for any kind of component (optional)
-    nextItemId: {}, // id of the follow up question (optional), usually you want to define this in selectOptions, rangeOption or inputOption
+    selectOptions: [
+      { label: 'Option 1', value: 'option 1', nextItemId: 2 },
+      { label: 'Option 2', value: 'option 2', nextItemId: 3 },
+    ],
+    defaultValue: 'option 1', // (optional)
   },
   // ...
 ];
 ```
 
-The structure for the navigation looks a follows:
+### Component types
 
-```js
+The component type defines where quaire finds the next question:
+
+| Component type   | Options                                          | Next question                       |
+| ---------------- | ------------------------------------------------ | ----------------------------------- |
+| `SINGLE_SELECT`  | `selectOptions: [{ label, value, nextItemId }]`  | `nextItemId` of the selected option |
+| `RANGE_SLIDER`   | `rangeOption: { range, nextItemId }`             | `rangeOption.nextItemId`            |
+| `INPUT`          | `inputOption: { type, placeholder, nextItemId }` | `inputOption.nextItemId`            |
+| any other string | -                                                | `nextItemId` of the item            |
+
+If there is no next question, the active question stays the same.
+You can add your own component types, see [Custom component types](https://github.com/devCrossNet/quaire/tree/main/examples/custom-component-types).
+
+### Options that depend on former answers
+
+Use `dependsOnResultProperties` when the options of a question depend on the answer of a former question.
+The options are then nested by the result property and the answer:
+
+```ts
+{
+  id: 2,
+  resultProperty: 'bar',
+  dependsOnResultProperties: ['foo'],
+  // ...
+  selectOptions: {
+    foo: {
+      'option 1': [{ label: 'Option 1.1', value: 'option 1.1', nextItemId: 3 }],
+      'option 2': [{ label: 'Option 2.1', value: 'option 2.1', nextItemId: 3 }],
+    },
+  },
+}
+```
+
+This works the same way for `rangeOption`, `inputOption`, and `defaultValue`.
+With more than one dependency, the objects are nested in the same order, for example
+`{ foo: { 'option 1': { bar: { 'option 1.1': [...] } } } }`.
+See [Dependencies between questions](https://github.com/devCrossNet/quaire/tree/main/examples/dependencies-between-questions).
+
+## 2. Define the navigation (optional)
+
+```ts
+import { QuaireNavigationItem } from 'quaire';
+
 export const navigationItems: QuaireNavigationItem[] = [
-  {
-    id: 1,
-    parentId: null, // has no parent
-    name: 'Category 1',
-  },
-  {
-    id: 2,
-    parentId: 1, // has a parent (works only for one level)
-    name: 'Subcategory 1',
-  },
-  {
-    id: 3,
-    parentId: null,
-    name: 'Category 2',
-  },
+  { id: 1, parentId: null, name: 'Category 1' }, // has no parent
+  { id: 2, parentId: 1, name: 'Subcategory 1' }, // has a parent (only one level is supported)
+  { id: 3, parentId: null, name: 'Category 2', icon: 'phone' },
 ];
 ```
 
-A navigation item without an own question is shown only if it has children with questions.
-For a parent item, `hasValue` and `isValid` are derived from its children.
+`getNavigation()` returns the navigation items with these additional properties:
+
+| Property        | Description                                                                      |
+| --------------- | -------------------------------------------------------------------------------- |
+| `value`         | Answer of the question. For select components, the option label                  |
+| `active`        | The active question belongs to this item (or one of its children)                |
+| `hasValue`      | The question of this item (or one of its children) has an answer                 |
+| `isValid`       | The question of this item is valid. Without own question: all children are valid |
+| `componentType` | Component type of the question                                                   |
+| `subNavigation` | Children of a parent item                                                        |
+
+A parent item without its own question is shown only if it has children with questions.
 Navigation items without any question are not shown.
+See [Navigation](https://github.com/devCrossNet/quaire/tree/main/examples/navigation).
 
-## Use quaire behaviour
+## 3. Use quaire
 
-To use the default behavior you need to initialize `Quaire` with the data you
-defined in the former step.
+Create a `Quaire` instance with your data:
 
-```js
+```ts
 import { Quaire } from 'quaire';
 
-const q = new Quaire({ items, navigationItems }); // (optional) you can pass an existing result to restore the questionnaire
+const q = new Quaire({ items, navigationItems });
 ```
 
-Next you can get the first active Question and display it in any way you want
+Get the active question and show it in any way you want:
 
-```js
+```ts
 let activeQuestion = q.getActiveQuestion(); // first question
-let navigation = q.getNavigation(); // initial navigation
-let result = q.getResult(); // initial result
+let navigation = q.getNavigation();
+let result = q.getResult(); // {}
+```
 
-// display activeQuestion.question and the related component presentation logic
-// Vue.js pseudo code example
+```vue
+<!-- Vue.js example -->
 <template>
-    <div>
-        <template v-if="activeQuestion.componentType === 'SINGLE_SELECT'">
-            {{ activeQuestion.question }}
-            // loop through activeQuestion.selectOptions, etc.
-        <template>
-    </div>
+  <div v-if="activeQuestion.componentType === 'SINGLE_SELECT'">
+    <h2>{{ activeQuestion.question }}</h2>
+    <button v-for="option in activeQuestion.selectOptions" :key="option.value" @click="onSubmit(option.value)">
+      {{ option.label }}
+    </button>
+  </div>
 </template>
 ```
 
-After the user selected an answer you can save the answer and get the next question.
-It's also a good idea to update the navigation and result
+When the user answers, save the answer. Then get the next question and update the navigation and the result:
 
-```js
-onSubmit(value: any) {
-    q.saveAnswer(value);
-    activeQuestion = q.getActiveQuestion(); // follow up question
-    navigation = q.getNavigation(); // update navigation
-    result = q.getResult(); // update result
+```ts
+function onSubmit(value: unknown) {
+  q.saveAnswer(value);
 
-    // ...
+  activeQuestion = q.getActiveQuestion(); // next question
+  navigation = q.getNavigation();
+  result = q.getResult();
 }
 ```
 
-You need to identify the end of the user-flow on your own.
-One way to do it is via the question ID or you create some logic around
-the result object of the Questionnaire.
+`defaultValue` is not saved automatically. To use it, pass it to `saveAnswer()`, for example as the initial value of your input.
 
-```js
-onSubmit(value: any) {
-    // ...
-    const isValid = q.isValid();
+## 4. Detect the end of the flow
 
-    // check if the questionnaire is valid
-    if(!isValid) {
-        return;
-    }
+You need to detect the end of the user flow yourself, for example via the question ID or via the result:
 
-    // via ID
-    if(activeQuestion.id === 3) {
-        // persist result to the backend, redirect to another page,
-        // whatever you want after the questionnaire is filled out
-    }
+```ts
+function onSubmit(value: unknown) {
+  // ...
 
-    // via result
-    if(result.foo && result.bar && result.baz) {
-        // persist result to the backend, redirect to another page,
-        // whatever you want after the questionnaire is filled out
-    }
+  if (!q.isValid()) {
+    return;
+  }
+
+  // via question ID
+  if (activeQuestion.id === 3) {
+    // save the result, redirect to another page, etc.
+  }
+
+  // via result
+  if (result.foo && result.bar && result.baz) {
+    // save the result, redirect to another page, etc.
+  }
 }
 ```
+
+# Guides
+
+## Validation
+
+- A required question without an answer gets a `REQUIRED` error.
+- `isValid()` is `true` when there are no errors. `getValidationErrors()` returns the errors by question ID.
+- If an answer changes, dependent answers that are no longer valid are reset to `null` or removed.
+  Questions that are no longer part of the flow are removed from the result.
+
+## Skip an optional question
+
+There are two ways to skip a question:
+
+- Branch around it: an option of a former question points to the question after it.
+- Save the `NO_VALUE` constant as the answer. The navigation then shows the question as answered.
+
+```ts
+import { NO_VALUE } from 'quaire';
+
+q.saveAnswer(NO_VALUE);
+```
+
+See [Linear flow with an optional question](https://github.com/devCrossNet/quaire/tree/main/examples/linear-flow-skip-question).
+
+## Jump to a question
+
+```ts
+q.setActiveQuestionByQuestionId(2);
+q.setActiveQuestionByNavigationItemId(1); // a parent item without question jumps to its first child
+```
+
+After the user changes the answer, the flow continues with the next question. The other answers stay.
+
+## Restore the state
+
+Save the result (for example in your backend) and pass it back later.
+quaire replays the answers and continues with the first question that has no answer:
+
+```ts
+const q = new Quaire({ items, navigationItems, result: { foo: 'option 1', bar: 'option 1.2' } });
+```
+
+See [Restore state](https://github.com/devCrossNet/quaire/tree/main/examples/restore-state).
 
 ## Typed result
 
-By default all answers are `unknown`. You can pass your own result type as
-fourth type parameter to get a typed result. Each answer is optional and can be
-`null`, because answers are missing until they are given and are reset to `null`
-when they become invalid.
+By default, all answers are `unknown`. Pass your own result type as the fourth type parameter to get a typed result.
+Each answer is optional and can be `null`: it is missing until the user answers, and it is reset to `null` when it becomes invalid.
 
 ```ts
 import { Quaire, QuaireItem, QuaireNavigationItem, QuaireQuestion } from 'quaire';
@@ -211,23 +291,41 @@ const q = new Quaire<QuaireItem, QuaireQuestion, QuaireNavigationItem, MyResult>
 const result = q.getResult(); // { foo?: string | null; bar?: Array<number> | null }
 ```
 
+# API
+
+| Method                                                  | Description                                          |
+| ------------------------------------------------------- | ---------------------------------------------------- |
+| `getActiveQuestion()`                                   | Returns the active question or `null`                |
+| `saveAnswer(answer)`                                    | Saves the answer of the active question and moves on |
+| `getResult()`                                           | Returns all answers by result property               |
+| `getNavigation()`                                       | Returns the navigation with values and states        |
+| `isValid()`                                             | Returns `true` when there are no validation errors   |
+| `getValidationErrors()`                                 | Returns the validation errors by question ID         |
+| `setActiveQuestionByQuestionId(questionId)`             | Sets the active question                             |
+| `setActiveQuestionByNavigationItemId(navigationItemId)` | Sets the active question by navigation item          |
+
 # Extend quaire
 
-- [Custom component types](https://github.com/devCrossNet/quaire/tree/main/examples/custom-component-types)
-- [Extending data definition](https://github.com/devCrossNet/quaire/tree/main/examples/extending-data-definition)
+`Quaire` is a class. Extend it and override its protected methods to change the behavior:
+
+- [Custom component types](https://github.com/devCrossNet/quaire/tree/main/examples/custom-component-types): add multi-select and boolean components
+- [Extending the data definition](https://github.com/devCrossNet/quaire/tree/main/examples/extending-data-definition): add your own properties to questions and navigation items
 
 # Examples
 
+Each example has a README with a diagram, the data, and tests that show the behavior step by step.
+
 - [Linear flow](https://github.com/devCrossNet/quaire/tree/main/examples/linear-flow)
 - [Linear flow with a loop](https://github.com/devCrossNet/quaire/tree/main/examples/linear-flow-with-loop)
-- [Linear flow with option question](https://github.com/devCrossNet/quaire/tree/main/examples/linear-flow-skip-question)
+- [Linear flow with an optional question](https://github.com/devCrossNet/quaire/tree/main/examples/linear-flow-skip-question)
 - [Branched flow that merges back into one](https://github.com/devCrossNet/quaire/tree/main/examples/branched-and-merged-flow)
 - [Dependencies between questions and validation](https://github.com/devCrossNet/quaire/tree/main/examples/dependencies-between-questions)
-- [Re-storing state of the questionnaire from the selected answers](https://github.com/devCrossNet/quaire/tree/main/examples/restore-state.spec.ts)
+- [Navigation](https://github.com/devCrossNet/quaire/tree/main/examples/navigation)
+- [Restore state](https://github.com/devCrossNet/quaire/tree/main/examples/restore-state)
 
 # Contribute
 
-Contributions are always welcome! Please read the [contribution guidelines](https://github.com/devCrossNet/quaire/blob/master/.github/CONTRIBUTING.md) first.
+Contributions are always welcome! Please read the [contribution guidelines](https://github.com/devCrossNet/quaire/blob/main/.github/CONTRIBUTING.md) first.
 
 # Contact
 
