@@ -1,7 +1,12 @@
-# Example for a branched flow that merges back together
+# Branched flow that merges back into one
 
-The flow branches in the first question in two completely different flows
-that merge back together after one question (you can have as many branches as you want).
+Question 1 splits the flow into two branches that merge back into question 4.
+You can have as many branches as you want.
+
+- **Branch A:** question 2 is a `RANGE_SLIDER`. Its next question is defined in `rangeOption.nextItemId`.
+- **Branch B:** question 3 is an `INPUT`. Its next question is defined in `inputOption.nextItemId`.
+
+Only the answers of the chosen branch are in the result.
 
 ```
                         ┌────────────┐
@@ -35,3 +40,5 @@ that merge back together after one question (you can have as many branches as yo
             │ Option 1 ├─────┴──────┤ Option 2 │
             └──────────┘            └──────────┘
 ```
+
+See [data.ts](./data.ts) for the data and [branched-and-merged-flow.spec.ts](./branched-and-merged-flow.spec.ts) for the behavior step by step.

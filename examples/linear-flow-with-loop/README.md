@@ -1,6 +1,7 @@
-# Example for a linear flow with a loop
+# Linear flow with a loop
 
-The second option of the last question allows the user to go back to the first question.
+Option 2 of the last question leads back to the first question.
+A `nextItemId` can point to any question, also to a former one.
 
 ```
            ┌────────────┐
@@ -40,3 +41,5 @@ The second option of the last question allows the user to go back to the first q
 │ Option 1 ├─────┴──────┤ Option 2 ├────┘
 └──────────┘            └──────────┘
 ```
+
+See [data.ts](./data.ts) for the data and [linear-flow-with-loop.spec.ts](./linear-flow-with-loop.spec.ts) for the behavior step by step.

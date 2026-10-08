@@ -1,6 +1,8 @@
-# Example for a linear flow
+# Linear flow
 
-This is a very simple flow with a couple of single select questions.
+A simple flow with three single-select questions. Every option leads to the next question.
+
+After the last question, the active question stays the same, because its options have no `nextItemId`.
 
 ```
            ┌────────────┐
@@ -40,3 +42,5 @@ This is a very simple flow with a couple of single select questions.
 │ Option 1 ├─────┴──────┤ Option 2 │
 └──────────┘            └──────────┘
 ```
+
+See [data.ts](./data.ts) for the data and [linear-flow.spec.ts](./linear-flow.spec.ts) for the behavior step by step.
