@@ -3,10 +3,11 @@
 Question 1 splits the flow into two branches that merge back into question 4.
 You can have as many branches as you want.
 
-- **Branch A:** question 2 is a `RANGE_SLIDER`. Its next question is defined in `rangeOption.nextItemId`.
-- **Branch B:** question 3 is an `INPUT`. Its next question is defined in `inputOption.nextItemId`.
+- **Branch A:** question 2 is a `RANGE` with a default value.
+- **Branch B:** question 3 is an `INPUT` with a default value.
 
 Only the answers of the chosen branch are in the result.
+When the user goes back and chooses the other branch, the answers of the old branch are removed.
 
 ```
                         ┌────────────┐

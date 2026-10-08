@@ -1,11 +1,13 @@
 # Linear flow with an optional question
 
-Question 2 is optional (`required: false`). This example shows both ways to skip it:
+Question 2 is optional. This example shows two ways to skip it:
 
 - **Branch around it:** Option 2 of question 1 leads directly to question 3.
-- **Answer with `NO_VALUE`:** Question 2 has an option with the value `NO_VALUE`.
+  Question 2 is not on the path, so the navigation shows it as not `reachable`.
+- **Answer with `NO_VALUE`:** Question 2 has a "Skip" option with the value `NO_VALUE`.
   The question counts as answered, and the navigation shows `NO_VALUE` as its value.
-  Use this for a "skip" or "I don't know" button.
+
+An optional question can also be skipped with `saveAnswer(null)`.
 
 ```
            ┌────────────┐

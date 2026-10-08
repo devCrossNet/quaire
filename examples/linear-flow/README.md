@@ -1,8 +1,9 @@
 # Linear flow
 
-A simple flow with three single-select questions. Every option leads to the next question.
+A simple flow with three single-select questions. Every option leads to the next question with `next`.
 
-After the last question, the active question stays the same, because its options have no `nextItemId`.
+The options of the last question have no `next`, so the flow ends there and `isComplete()` is `true`.
+An answer that is not an option gets the error `INVALID_OPTION`, and the question stays active.
 
 ```
            ┌────────────┐

@@ -1,19 +1,19 @@
 # Custom component types
 
-This example extends `Quaire` with two new component types:
+This example adds a `RATING` component type with a `stars` property.
 
-- `MULTI_SELECT`: the answer is an array of option values
-- `BOOLEAN`: the answer is `true` or `false`
+[rating.ts](./rating.ts) defines the type and its behavior:
 
-[MyQuaire.ts](./MyQuaire.ts) overrides these protected properties and methods:
+- `RatingDefinition` describes the properties of a rating question.
+- `MyQuestionDefinition` combines the built-in types with the rating type.
+- The `rating` component validates the answer and shows "4 / 5" in the navigation.
 
-| Override                                    | Why                                                                                        |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `_selectComponentTypes`                     | `MULTI_SELECT` uses `selectOptions` like `SINGLE_SELECT`                                   |
-| `_alwaysPossibleFollowUpQuestionComponents` | a `BOOLEAN` question that depends on former answers always stays in the flow               |
-| `_validateSelectComponent`                  | a `MULTI_SELECT` answer is valid if at least one value is a valid option                   |
-| `_getNextItemIdFromSelectComponents`        | find the next question for an array of values                                              |
-| `_getDependencyPath`                        | a `MULTI_SELECT` answer is sorted and joined with `_` to one key, e.g. `option 1_option 2` |
-| `_getNavigationValue`                       | show the labels of all selected options in the navigation                                  |
+The component is passed to quaire with the `components` option:
+
+```ts
+new Quaire<object, MyQuestionDefinition>({ questions, components: { RATING: rating } });
+```
+
+The flow uses a condition on the rating: a rating of 2 or less leads to a `MULTI_SELECT` question about improvements.
 
 See [data.ts](./data.ts) for the data and [custom-component-types.spec.ts](./custom-component-types.spec.ts) for the behavior step by step.
