@@ -330,7 +330,6 @@ Contributions are always welcome! Please read the [contribution guidelines](http
 # Contact
 
 - [Discord](https://discord.gg/59x5cg2)
-- [Twitter](https://twitter.com/_jwerner_)
 
 # License
 
