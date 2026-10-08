@@ -143,10 +143,10 @@ export class Quaire<
   protected _getQuestion(itemId: number | undefined) {
     const item = this._getItem(itemId);
 
-    if (!item) {
-      return null;
-    }
+    return item ? this._getQuestionFromItem(item) : null;
+  }
 
+  protected _getQuestionFromItem(item: IItem) {
     let selectOptions: Array<QuaireItemOption> | null;
     let rangeOption: QuaireRangeItemOption | null;
     let inputOption: QuaireInputItemOption | null;
@@ -234,41 +234,38 @@ export class Quaire<
 
   protected _validate(activeQuestion: IQuestion | null) {
     this._items.forEach((item) => {
-      const question = this._getQuestion(item.id);
+      const question = this._getQuestionFromItem(item);
+      const currentAnswer = this._getResultByValueProperty(question.resultProperty);
+      const possibleFollowUpQuestionIds: number[] = [];
 
-      if (question) {
-        const currentAnswer = this._getResultByValueProperty(question.resultProperty);
-        const possibleFollowUpQuestionIds: number[] = [];
+      question.dependsOnQuestions.forEach((q) => {
+        const dependsOnQuestionResult = this._result[q.resultProperty];
 
-        question.dependsOnQuestions.forEach((q) => {
-          const dependsOnQuestionResult = this._result[q.resultProperty];
-
-          // only take possible follow up id's based on the current result of the dependent question
-          q.selectOptions?.forEach((o) => {
-            if (o.value === dependsOnQuestionResult && o.nextItemId) {
-              possibleFollowUpQuestionIds.push(o.nextItemId);
-            }
-          });
+        // only take possible follow up id's based on the current result of the dependent question
+        q.selectOptions?.forEach((o) => {
+          if (o.value === dependsOnQuestionResult && o.nextItemId) {
+            possibleFollowUpQuestionIds.push(o.nextItemId);
+          }
         });
+      });
 
-        // Some components always allow a dependent question to be in the flow
-        if (this._alwaysPossibleFollowUpQuestionComponents.includes(question.componentType)) {
-          possibleFollowUpQuestionIds.push(question.id);
-        }
+      // Some components always allow a dependent question to be in the flow
+      if (this._alwaysPossibleFollowUpQuestionComponents.includes(question.componentType)) {
+        possibleFollowUpQuestionIds.push(question.id);
+      }
 
-        const isQuestionInCurrentFlow =
-          question.dependsOnQuestions.length > 0 ? possibleFollowUpQuestionIds.includes(question.id) : true;
+      const isQuestionInCurrentFlow =
+        question.dependsOnQuestions.length > 0 ? possibleFollowUpQuestionIds.includes(question.id) : true;
 
-        if (!isQuestionInCurrentFlow) {
-          delete this._result[question.resultProperty];
-          delete this._validationErrors[question.id];
-        } else if (currentAnswer && this._selectComponentTypes.includes(question.componentType)) {
-          this._validateSelectComponent(question, currentAnswer);
-        } else if (currentAnswer && this._rangeComponentTypes.includes(question.componentType)) {
-          this._validateRangeComponent(question, activeQuestion);
-        } else {
-          this._validateGenericComponent(isQuestionInCurrentFlow, question, activeQuestion, currentAnswer);
-        }
+      if (!isQuestionInCurrentFlow) {
+        delete this._result[question.resultProperty];
+        delete this._validationErrors[question.id];
+      } else if (currentAnswer && this._selectComponentTypes.includes(question.componentType)) {
+        this._validateSelectComponent(question, currentAnswer);
+      } else if (currentAnswer && this._rangeComponentTypes.includes(question.componentType)) {
+        this._validateRangeComponent(question, activeQuestion);
+      } else {
+        this._validateGenericComponent(isQuestionInCurrentFlow, question, activeQuestion, currentAnswer);
       }
     });
   }
@@ -417,15 +414,36 @@ export class Quaire<
     return null;
   }
 
+  // used for parent navigation items without an own question, the values are derived from the children
+  protected _getParentNavigationItemObject(navigationItem: INavigationItem): INavigationItem {
+    const item: any = {
+      id: navigationItem.id,
+      name: navigationItem.name,
+      value: null,
+      icon: navigationItem.icon,
+      active: false,
+      isValid: true,
+      hasValue: false,
+      componentType: null,
+      subNavigation: [],
+    };
+
+    return item;
+  }
+
   protected _addNavigationItem(
     navigationItems: { [key: string]: INavigationItem },
     activeNavigationItem: INavigationItem | null,
     navigationItem: INavigationItem,
+    parentNavigationItemIds: Set<number>,
   ) {
     const newNavigationItem = this._getNavigationItem(activeNavigationItem, navigationItem);
 
     if (newNavigationItem) {
       navigationItems[navigationItem.id] = newNavigationItem;
+    } else {
+      navigationItems[navigationItem.id] = this._getParentNavigationItemObject(navigationItem);
+      parentNavigationItemIds.add(navigationItem.id);
     }
   }
 
@@ -446,15 +464,27 @@ export class Quaire<
 
   public getNavigation = (): INavigationItem[] => {
     const navigationItems: { [key: string]: INavigationItem } = {};
+    const parentNavigationItemIds = new Set<number>();
     const activeNavigationItem = this._getActiveQuestionNavigationItem();
 
     this._navigationItems.forEach((navigationItem) => {
       const hasParent = Boolean(navigationItem.parentId);
 
       if (!hasParent) {
-        this._addNavigationItem(navigationItems, activeNavigationItem, navigationItem);
+        this._addNavigationItem(navigationItems, activeNavigationItem, navigationItem, parentNavigationItemIds);
       } else {
         this._addChildNavigationItem(navigationItems, activeNavigationItem, navigationItem);
+      }
+    });
+
+    parentNavigationItemIds.forEach((id) => {
+      const subNavigation = navigationItems[id].subNavigation as INavigationItem[];
+
+      if (subNavigation.length === 0) {
+        delete navigationItems[id];
+      } else {
+        navigationItems[id].hasValue = subNavigation.some((child) => child.hasValue);
+        navigationItems[id].isValid = subNavigation.every((child) => child.isValid);
       }
     });
 
