@@ -6,8 +6,10 @@ import {
   QuaireItemOption,
   QuaireNavigationItem,
   QuaireOptions,
+  QuairePartialResult,
   QuaireQuestion,
   QuaireRangeItemOption,
+  QuaireResult,
 } from './types';
 import { QuaireComponentType, QuaireValidationError } from './enums';
 import { getByPath, hasAnswer } from './utils';
@@ -16,12 +18,12 @@ export class Quaire<
   Item extends QuaireItem = QuaireItem,
   Question extends QuaireQuestion = QuaireQuestion,
   NavigationItem extends QuaireNavigationItem = QuaireNavigationItem,
-> implements QuaireBase<Question, NavigationItem> {
+  Result extends object = QuaireResult,
+> implements QuaireBase<Question, NavigationItem, Result> {
   protected _activeItemId: number | null = null;
   protected readonly _items: Array<Item>;
   protected readonly _navigationItems: Array<NavigationItem>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- answers can have any shape, consumers read them directly
-  protected readonly _result: Record<string, any> = {};
+  protected readonly _result: QuaireResult = {};
   protected readonly _validationErrors: Record<number, QuaireValidationError> = {};
   protected readonly _selectComponentTypes: Array<string> = [QuaireComponentType.SINGLE_SELECT];
   protected readonly _rangeComponentTypes: Array<string> = [QuaireComponentType.RANGE_SLIDER];
@@ -31,7 +33,7 @@ export class Quaire<
     QuaireComponentType.INPUT,
   ];
 
-  constructor({ items, navigationItems, result }: QuaireOptions<Item, NavigationItem>) {
+  constructor({ items, navigationItems, result }: QuaireOptions<Item, NavigationItem, Result>) {
     this._items = items;
     this._navigationItems = navigationItems || [];
 
@@ -40,7 +42,7 @@ export class Quaire<
     }
 
     if (result) {
-      this._result = result;
+      this._result = result as QuaireResult;
       this._setActiveItemId();
     }
 
@@ -136,7 +138,7 @@ export class Quaire<
 
       if (resultPropertyValue) {
         path.push(resultProperty);
-        path.push(resultPropertyValue);
+        path.push(String(resultPropertyValue));
       }
     });
 
@@ -274,7 +276,7 @@ export class Quaire<
   }
 
   public getResult() {
-    return this._result;
+    return this._result as QuairePartialResult<Result>;
   }
 
   public getValidationErrors() {

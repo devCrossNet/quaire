@@ -1,4 +1,11 @@
-import { Quaire, QuaireComponentType, QuaireItem, QuaireNavigationItem } from './index';
+import {
+  Quaire,
+  QuaireComponentType,
+  QuaireItem,
+  QuaireNavigationItem,
+  QuairePartialResult,
+  QuaireQuestion,
+} from './index';
 
 describe('Quaire', () => {
   const items: Array<QuaireItem> = [
@@ -312,6 +319,37 @@ describe('Quaire', () => {
 
       expect(Q.isValid()).toBe(true);
       expect(Q.getValidationErrors()).toEqual({});
+    });
+  });
+
+  describe('result type', () => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interfaces must work as result type
+    interface MyResult {
+      foo: string;
+      bar: Array<number>;
+      baz: string | number;
+    }
+
+    test('should type the result with a custom result type', () => {
+      const Q = new Quaire<QuaireItem, QuaireQuestion, QuaireNavigationItem, MyResult>({
+        items,
+        result: { foo: 'option 1' },
+      });
+
+      Q.saveAnswer([20, 50]);
+
+      const result = Q.getResult();
+
+      expectTypeOf(result.foo).toEqualTypeOf<string | null | undefined>();
+      expectTypeOf(result.bar).toEqualTypeOf<Array<number> | null | undefined>();
+      expect(result).toEqual({ foo: 'option 1', bar: [20, 50] });
+    });
+
+    test('should use unknown values without a custom result type', () => {
+      const Q = new Quaire({ items });
+
+      expectTypeOf(Q.getResult()).toEqualTypeOf<QuairePartialResult>();
+      expectTypeOf(Q.getActiveQuestion().value).toEqualTypeOf<unknown>();
     });
   });
 
