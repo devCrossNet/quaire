@@ -65,7 +65,9 @@ export class MyQuaire extends Quaire {
 
       if (resultPropertyValue) {
         path.push(resultProperty);
-        path.push(Array.isArray(resultPropertyValue) ? resultPropertyValue.sort().join('_') : resultPropertyValue);
+        path.push(
+          Array.isArray(resultPropertyValue) ? resultPropertyValue.sort().join('_') : String(resultPropertyValue),
+        );
       }
     });
     return path;

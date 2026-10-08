@@ -192,6 +192,25 @@ onSubmit(value: any) {
 }
 ```
 
+## Typed result
+
+By default all answers are `unknown`. You can pass your own result type as
+fourth type parameter to get a typed result. Each answer is optional and can be
+`null`, because answers are missing until they are given and are reset to `null`
+when they become invalid.
+
+```ts
+import { Quaire, QuaireItem, QuaireNavigationItem, QuaireQuestion } from 'quaire';
+
+type MyResult = {
+  foo: string;
+  bar: Array<number>;
+};
+
+const q = new Quaire<QuaireItem, QuaireQuestion, QuaireNavigationItem, MyResult>({ items, navigationItems });
+const result = q.getResult(); // { foo?: string | null; bar?: Array<number> | null }
+```
+
 # Extend quaire
 
 - [Custom component types](https://github.com/devCrossNet/quaire/tree/main/examples/custom-component-types)

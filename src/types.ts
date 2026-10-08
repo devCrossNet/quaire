@@ -1,13 +1,20 @@
 import { QuaireComponentType, QuaireValidationError } from './enums';
 
+export type QuaireResult = Record<string, unknown>;
+
+// answers are missing until they are given and null when they became invalid
+export type QuairePartialResult<Result extends object = QuaireResult> = {
+  [Key in keyof Result]?: Result[Key] | null;
+};
+
 export type QuaireBase<
   Question extends QuaireQuestion = QuaireQuestion,
   NavigationItem extends QuaireNavigationItem = QuaireNavigationItem,
+  Result extends object = QuaireResult,
 > = {
   saveAnswer(answer: unknown): void;
   getActiveQuestion(): Question | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- answers can have any shape, consumers read them directly
-  getResult(): Record<string, any>;
+  getResult(): QuairePartialResult<Result>;
   getValidationErrors(): Record<number, QuaireValidationError>;
   setActiveQuestionByNavigationItemId(navigationItemId: number): void;
   setActiveQuestionByQuestionId(questionId: number): void;
@@ -18,10 +25,11 @@ export type QuaireBase<
 export type QuaireOptions<
   Item extends QuaireItem = QuaireItem,
   NavigationItem extends QuaireNavigationItem = QuaireNavigationItem,
+  Result extends object = QuaireResult,
 > = {
   items: Array<Item>;
   navigationItems?: Array<NavigationItem>;
-  result?: Record<string, unknown>;
+  result?: QuairePartialResult<Result>;
 };
 
 export type QuaireItemOption = {
@@ -63,8 +71,7 @@ export type QuaireItem = {
 export type QuaireNavigationItem = {
   id: number;
   name: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- answers can have any shape, consumers read them directly
-  value?: any;
+  value?: unknown;
   icon?: string;
   parentId?: number | null;
   active?: boolean;
@@ -81,8 +88,7 @@ export type QuaireQuestion = {
   description: string;
   required: boolean;
   resultProperty: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- answers can have any shape, consumers read them directly
-  value: any;
+  value: unknown;
   valueHasChanged?: boolean;
   componentType: QuaireComponentType | string;
   isValid: boolean;
@@ -90,7 +96,6 @@ export type QuaireQuestion = {
   selectOptions?: Array<QuaireItemOption> | null;
   rangeOption?: QuaireRangeItemOption | null;
   inputOption?: QuaireInputItemOption | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- answers can have any shape, consumers read them directly
-  defaultValue?: any;
+  defaultValue?: unknown;
   nextItemId?: number;
 };
