@@ -464,7 +464,7 @@ export class Quaire<
     if (parent && subNavigationItem) {
       parent.subNavigation?.push(subNavigationItem);
       parent.active = parent.active || activeNavigationItem?.parentId === navigationItem.parentId;
-      parent.hasValue = true;
+      parent.hasValue = parent.hasValue || subNavigationItem.hasValue;
     }
   }
 
@@ -492,7 +492,6 @@ export class Quaire<
       if (subNavigation.length === 0) {
         delete navigationItems[id];
       } else {
-        navigationItems[id].hasValue = subNavigation.some((child) => child.hasValue);
         navigationItems[id].isValid = subNavigation.every((child) => child.isValid);
       }
     });

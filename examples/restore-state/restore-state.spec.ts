@@ -1,5 +1,5 @@
-import { Quaire } from '../src';
-import { items, navigationItems } from './dependencies-between-questions/data';
+import { Quaire } from '../../src';
+import { items, navigationItems } from '../dependencies-between-questions/data';
 
 describe('restore-state', () => {
   test('should restore the state from a complete result', () => {
@@ -129,7 +129,7 @@ describe('restore-state', () => {
       {
         active: true,
         componentType: 'SINGLE_SELECT',
-        hasValue: true,
+        hasValue: false,
         id: 1,
         isValid: false,
         name: 'Category 1',
