@@ -15,11 +15,11 @@ import { QuaireComponentType, QuaireValidationError } from './enums';
 import { getByPath, hasAnswer } from './utils';
 
 export class Quaire<
+  Result extends object = QuaireResult,
   Item extends QuaireItem = QuaireItem,
   Question extends QuaireQuestion = QuaireQuestion,
   NavigationItem extends QuaireNavigationItem = QuaireNavigationItem,
-  Result extends object = QuaireResult,
-> implements QuaireBase<Question, NavigationItem, Result> {
+> implements QuaireBase<Result, Question, NavigationItem> {
   protected _activeItemId: number | null = null;
   protected readonly _items: Array<Item>;
   protected readonly _navigationItems: Array<NavigationItem>;
@@ -33,7 +33,7 @@ export class Quaire<
     QuaireComponentType.INPUT,
   ];
 
-  constructor({ items, navigationItems, result }: QuaireOptions<Item, NavigationItem, Result>) {
+  constructor({ items, navigationItems, result }: QuaireOptions<Result, Item, NavigationItem>) {
     this._items = items;
     this._navigationItems = navigationItems || [];
 

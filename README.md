@@ -276,18 +276,18 @@ See [Restore state](https://github.com/devCrossNet/quaire/tree/main/examples/res
 
 ## Typed result
 
-By default, all answers are `unknown`. Pass your own result type as the fourth type parameter to get a typed result.
+By default, all answers are `unknown`. Pass your own result type as the first type parameter to get a typed result.
 Each answer is optional and can be `null`: it is missing until the user answers, and it is reset to `null` when it becomes invalid.
 
 ```ts
-import { Quaire, QuaireItem, QuaireNavigationItem, QuaireQuestion } from 'quaire';
+import { Quaire } from 'quaire';
 
 type MyResult = {
   foo: string;
   bar: Array<number>;
 };
 
-const q = new Quaire<QuaireItem, QuaireQuestion, QuaireNavigationItem, MyResult>({ items, navigationItems });
+const q = new Quaire<MyResult>({ items, navigationItems });
 const result = q.getResult(); // { foo?: string | null; bar?: Array<number> | null }
 ```
 
