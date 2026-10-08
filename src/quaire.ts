@@ -1,4 +1,3 @@
-import * as _get from 'lodash.get';
 import { NO_VALUE } from './constants';
 import {
   QuaireBase,
@@ -11,14 +10,13 @@ import {
   QuaireRangeItemOption,
 } from './interfaces';
 import { QuaireComponentType, QuaireValidationError } from './enums';
-import { hasAnswer } from './utils';
+import { getByPath, hasAnswer } from './utils';
 
 export class Quaire<
   IItem extends QuaireItem = QuaireItem,
   IQuestion extends QuaireQuestion = QuaireQuestion,
   INavigationItem extends QuaireNavigationItem = QuaireNavigationItem,
-> implements QuaireBase<IQuestion, INavigationItem>
-{
+> implements QuaireBase<IQuestion, INavigationItem> {
   protected _activeItemId: number | null = null;
   protected readonly _items: Array<IItem>;
   protected readonly _navigationItems: Array<INavigationItem>;
@@ -156,10 +154,10 @@ export class Quaire<
 
     if (item.dependsOnResultProperties.length > 0) {
       const path = this._getDependencyPath(item);
-      selectOptions = _get(item.selectOptions, path, null);
-      rangeOption = _get(item.rangeOption, path, null);
-      inputOption = _get(item.inputOption, path, null);
-      defaultValue = _get(item.defaultValue, path, null);
+      selectOptions = getByPath(item.selectOptions, path, null);
+      rangeOption = getByPath(item.rangeOption, path, null);
+      inputOption = getByPath(item.inputOption, path, null);
+      defaultValue = getByPath(item.defaultValue, path, null);
     } else {
       selectOptions = item.selectOptions ? (item.selectOptions as Array<QuaireItemOption>) : null;
       rangeOption = item.rangeOption ? item.rangeOption : null;

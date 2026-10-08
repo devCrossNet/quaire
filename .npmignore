@@ -2,9 +2,10 @@
 coverage
 src
 .eslintcache
-.eslintignore
-.eslintrc.js
+eslint.config.mjs
+vitest.config.mts
 .prettierignore
 .prettierrc
-commitlint.config.js
+commitlint.config.mjs
 tsconfig.json
+tsconfig.test.json
