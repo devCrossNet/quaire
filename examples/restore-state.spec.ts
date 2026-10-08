@@ -1,8 +1,8 @@
 import { Quaire } from '../src';
 import { items, navigationItems } from './dependencies-between-questions/data';
 
-describe('restore state', () => {
-  test('should restore state from existing result', () => {
+describe('restore-state', () => {
+  test('should restore the state from a complete result', () => {
     const Q = new Quaire({
       items,
       navigationItems,
@@ -58,7 +58,7 @@ describe('restore state', () => {
     ]);
   });
 
-  test('should restore state from partially existing result', () => {
+  test('should restore the state from a partial result', () => {
     const Q = new Quaire({ items, navigationItems, result: { foo: 'option 1', bar: 'option 1.2' } });
 
     expect(Q.getActiveQuestion().selectOptions).toEqual([
@@ -109,7 +109,7 @@ describe('restore state', () => {
     ]);
   });
 
-  test('should restore state from empty existing result', () => {
+  test('should start at question 1 with an empty result', () => {
     const Q = new Quaire({ items, navigationItems, result: {} });
 
     expect(Q.getActiveQuestion().selectOptions).toEqual([

@@ -8,7 +8,13 @@ describe('custom-component-types', () => {
     Q = new MyQuaire({ items, navigationItems });
   });
 
-  test('should validate new component types based on dependent answers', () => {
+  const answerAllQuestionsWithOption1 = () => {
+    Q.saveAnswer('option 1');
+    Q.saveAnswer(['option 2', 'option 1']);
+    Q.saveAnswer(true);
+  };
+
+  test('should go through MULTI_SELECT and BOOLEAN questions', () => {
     let activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 1');
 
@@ -77,10 +83,13 @@ describe('custom-component-types', () => {
         value: true,
       },
     ]);
+  });
 
-    // reset flow by choosing different answer
+  test('should reset the MULTI_SELECT answer when the first answer changes', () => {
+    answerAllQuestionsWithOption1();
+
     Q.saveAnswer('option 2');
-    activeQuestion = Q.getActiveQuestion();
+    const activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 2');
     expect(activeQuestion.componentType).toBe(MyComponentType.MULTI_SELECT);
     expect(activeQuestion.selectOptions).toEqual([
@@ -132,13 +141,16 @@ describe('custom-component-types', () => {
         value: true,
       },
     ]);
+  });
 
-    // provide wrong answer
+  test('should only accept MULTI_SELECT options that match the first answer', () => {
+    answerAllQuestionsWithOption1();
+    Q.saveAnswer('option 2');
+
     Q.saveAnswer('option 1');
-    activeQuestion = Q.getActiveQuestion();
+    let activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 2');
 
-    // provide correct answer
     Q.saveAnswer(['option 3', 'option 4']);
     activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 3');

@@ -1,14 +1,14 @@
 import { NO_VALUE, Quaire } from '../../src';
 import { items, navigationItems } from './data';
 
-describe('linear-flow', () => {
+describe('linear-flow-skip-question', () => {
   let Q;
 
   beforeEach(() => {
     Q = new Quaire({ items, navigationItems });
   });
 
-  test('should go through the linear flow and skip 2. question', () => {
+  test('should skip question 2 when option 2 is chosen', () => {
     let activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 1');
 
@@ -61,7 +61,7 @@ describe('linear-flow', () => {
     ]);
   });
 
-  test('should answer the 2. question with the skip option', () => {
+  test('should save NO_VALUE when question 2 is skipped', () => {
     let activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 1');
 

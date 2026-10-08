@@ -8,7 +8,7 @@ describe('branched-and-merged-flow', () => {
     Q = new Quaire({ items, navigationItems });
   });
 
-  test('should go through branch a', () => {
+  test('should go through branch A (range slider) and merge into question 4', () => {
     let activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 1');
 
@@ -67,7 +67,7 @@ describe('branched-and-merged-flow', () => {
     ]);
   });
 
-  test('should go through branch b', () => {
+  test('should go through branch B (input) and merge into question 4', () => {
     let activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 1');
 

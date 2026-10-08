@@ -8,7 +8,7 @@ describe('linear-flow-with-loop', () => {
     Q = new Quaire({ items, navigationItems });
   });
 
-  test('should go through the linear flow and back to the first question', () => {
+  test('should go back to question 1 after the last question', () => {
     let activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 1');
 

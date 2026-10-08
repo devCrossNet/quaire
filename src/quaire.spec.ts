@@ -1,6 +1,6 @@
-import { Quaire, QuaireComponentType, QuaireItem, QuaireNavigationItem } from '../src';
+import { Quaire, QuaireComponentType, QuaireItem, QuaireNavigationItem } from './index';
 
-describe('misc', () => {
+describe('Quaire', () => {
   const items: Array<QuaireItem> = [
     {
       id: 1,
@@ -102,12 +102,12 @@ describe('misc', () => {
     {
       id: 4,
       parentId: 1,
-      name: 'Subcategory 2',
+      name: 'Subcategory 3',
     },
   ];
 
-  describe('components', () => {
-    test('different default values for input and range components based on dependencies', () => {
+  describe('dependent options', () => {
+    test('should use range, input and default values based on the dependent answer', () => {
       const Q = new Quaire({ items });
 
       let activeQuestion = Q.getActiveQuestion();
@@ -169,14 +169,14 @@ describe('misc', () => {
   });
 
   describe('navigation', () => {
-    test('empty items and navigation', () => {
+    test('should return an empty navigation without items', () => {
       const Q = new Quaire({ items: [] });
 
       expect(Q.getActiveQuestion()).toBeNull();
       expect(Q.getNavigation()).toEqual([]);
     });
 
-    test('navigate via navigation item ID', () => {
+    test('should set the active question by navigation item ID', () => {
       const Q = new Quaire({ items, navigationItems });
 
       Q.setActiveQuestionByNavigationItemId(3);
@@ -187,6 +187,122 @@ describe('misc', () => {
 
       Q.setActiveQuestionByNavigationItemId(1);
       expect(Q.getActiveQuestion().id).toBe(1);
+    });
+    test('should derive a parent navigation item from its children when it has no question', () => {
+      const Q = new Quaire({ items, navigationItems });
+
+      expect(Q.getNavigation()).toEqual([
+        {
+          id: 1,
+          name: 'Category 1',
+          value: null,
+          icon: undefined,
+          active: true,
+          isValid: false,
+          hasValue: false,
+          componentType: null,
+          subNavigation: [
+            {
+              id: 2,
+              name: 'Subcategory 1',
+              value: null,
+              icon: undefined,
+              active: true,
+              isValid: false,
+              hasValue: false,
+              componentType: 'SINGLE_SELECT',
+            },
+            {
+              id: 3,
+              name: 'Subcategory 2',
+              value: null,
+              icon: undefined,
+              active: false,
+              isValid: false,
+              hasValue: false,
+              componentType: 'RANGE_SLIDER',
+            },
+            {
+              id: 4,
+              name: 'Subcategory 3',
+              value: null,
+              icon: undefined,
+              active: false,
+              isValid: false,
+              hasValue: false,
+              componentType: 'INPUT',
+            },
+          ],
+        },
+      ]);
+
+      Q.saveAnswer('option 1');
+      Q.saveAnswer([20, 50]);
+      Q.saveAnswer('text');
+
+      const [parent] = Q.getNavigation();
+      expect(parent.hasValue).toBe(true);
+      expect(parent.isValid).toBe(true);
+    });
+
+    test('should skip navigation items without questions', () => {
+      const navigationItemsWithoutQuestions: Array<QuaireNavigationItem> = [
+        { id: 1, parentId: null, name: 'Category 1' },
+        { id: 2, parentId: 1, name: 'Subcategory 1' },
+        { id: 3, parentId: 1, name: 'Subcategory without question' },
+        { id: 5, parentId: null, name: 'Category without question' },
+      ];
+      const Q = new Quaire({ items: [items[0]], navigationItems: navigationItemsWithoutQuestions });
+
+      const navigation = Q.getNavigation();
+
+      expect(navigation.map((item) => item.name)).toEqual(['Category 1']);
+      expect(navigation[0].subNavigation.map((item) => item.name)).toEqual(['Subcategory 1']);
+    });
+  });
+
+  describe('active question', () => {
+    test('should have no active question for an unknown question ID', () => {
+      const Q = new Quaire({ items });
+
+      Q.setActiveQuestionByQuestionId(99);
+
+      expect(Q.getActiveQuestion()).toBeNull();
+    });
+
+    test('should ignore answers when no question is active', () => {
+      const Q = new Quaire({ items, navigationItems });
+
+      Q.setActiveQuestionByNavigationItemId(99);
+      Q.saveAnswer('option 1');
+
+      expect(Q.getActiveQuestion()).toBeNull();
+      expect(Q.getResult()).toEqual({});
+    });
+  });
+
+  describe('validation', () => {
+    test('should be invalid until all required questions are answered', () => {
+      const Q = new Quaire({ items });
+
+      expect(Q.isValid()).toBe(false);
+      expect(Q.getValidationErrors()).toEqual({ '1': 'REQUIRED', '2': 'REQUIRED', '3': 'REQUIRED' });
+
+      Q.saveAnswer('option 1');
+      Q.saveAnswer([20, 50]);
+      Q.saveAnswer('text');
+
+      expect(Q.isValid()).toBe(true);
+      expect(Q.getValidationErrors()).toEqual({});
+    });
+  });
+
+  describe('restore state', () => {
+    test('should keep the result when there are no items', () => {
+      const Q = new Quaire({ items: [], result: { foo: 'option 1' } });
+
+      expect(Q.getActiveQuestion()).toBeNull();
+      expect(Q.getResult()).toEqual({ foo: 'option 1' });
     });
   });
 });

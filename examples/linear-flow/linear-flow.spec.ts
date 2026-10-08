@@ -8,12 +8,16 @@ describe('linear-flow', () => {
     Q = new Quaire({ items, navigationItems });
   });
 
-  test('should go through the linear flow', () => {
-    let activeQuestion = Q.getActiveQuestion();
-    expect(activeQuestion.question).toBe('Question 1');
-
+  test('should stay on the question when the answer is not a valid option', () => {
     Q.saveAnswer('option 4');
-    activeQuestion = Q.getActiveQuestion();
+
+    expect(Q.getActiveQuestion().question).toBe('Question 1');
+    expect(Q.getResult()).toEqual({ foo: null });
+    expect(Q.getValidationErrors()).toEqual({ '1': 'REQUIRED', '2': 'REQUIRED', '3': 'REQUIRED' });
+  });
+
+  test('should go through all questions in order', () => {
+    let activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 1');
 
     Q.saveAnswer('option 1');
