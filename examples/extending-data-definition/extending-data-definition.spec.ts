@@ -8,7 +8,7 @@ describe('extending-data-definition', () => {
     Q = new MyQuaire({ items, navigationItems });
   });
 
-  test('should validate new component types based on dependent answers', () => {
+  test('should add custom properties to questions and navigation items', () => {
     let activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.question).toBe('Question 1');
     expect(activeQuestion.progress).toBe(50);

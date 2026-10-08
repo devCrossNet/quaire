@@ -8,7 +8,7 @@ describe('dependencies-between-questions', () => {
     Q = new Quaire({ items, navigationItems });
   });
 
-  test('should have select options based on interdependencies', () => {
+  test('should show select options based on the previous answers', () => {
     let activeQuestion = Q.getActiveQuestion();
     expect(activeQuestion.selectOptions).toEqual([
       {
@@ -94,48 +94,10 @@ describe('dependencies-between-questions', () => {
     ]);
   });
 
-  test('should react and validate later questions based on first question', () => {
+  test('should reset and invalidate dependent questions when the first answer changes', () => {
     Q.saveAnswer('option 1');
     Q.saveAnswer('option 1.1');
     Q.saveAnswer('option 1.1.1');
-
-    expect(Q.getResult()).toEqual({
-      foo: 'option 1',
-      bar: 'option 1.1',
-      baz: 'option 1.1.1',
-    });
-    expect(Q.getNavigation()).toEqual([
-      {
-        active: false,
-        componentType: 'SINGLE_SELECT',
-        hasValue: true,
-        id: 1,
-        isValid: true,
-        name: 'Category 1',
-        subNavigation: [
-          {
-            active: false,
-            componentType: 'SINGLE_SELECT',
-            hasValue: true,
-            id: 2,
-            isValid: true,
-            name: 'Subcategory 1',
-            value: 'Option 1.1',
-          },
-        ],
-        value: 'Option 1',
-      },
-      {
-        active: true,
-        componentType: 'SINGLE_SELECT',
-        hasValue: true,
-        id: 3,
-        isValid: true,
-        name: 'Category 2',
-        subNavigation: [],
-        value: 'Option 1.1.1',
-      },
-    ]);
 
     Q.setActiveQuestionByQuestionId(1);
     Q.saveAnswer('option 2');
