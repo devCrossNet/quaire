@@ -1,16 +1,19 @@
 # Extending the data definition
 
-This example adds custom properties to the data, for example to show a progress bar or a unit in your view.
+This example adds custom properties to the data, for example to show a progress bar, a unit, or an icon in your view.
 
-- `MyItem` adds `progress` to the questions and `divisor` and `unit` to `rangeOption`.
-- `MyQuestion` and `MyNavigationItem` add the same properties to the output.
+- `MyQuestionDefinition` adds `progress` and `unit` to every question.
+- `MyNavigationDefinition` adds `color` to every navigation item.
+- Select options can have custom properties without a new type, e.g. `icon`.
 
-[MyQuaire.ts](./MyQuaire.ts) passes the types as type parameters (`Quaire<QuaireResult, MyItem, MyQuestion, MyNavigationItem>`)
-and overrides two protected methods to copy the properties:
+Pass the types as type parameters. quaire keeps all custom properties in the questions and navigation items:
 
-- `_getQuestionObject`: adds `progress` to the active question
-- `_getNavigationItemObject`: adds `progress` and `unit` to the navigation items
+```ts
+const quaire = new Quaire<object, MyQuestionDefinition, MyNavigationDefinition>({ questions, navigation });
 
-Custom properties in `rangeOption`, `selectOptions`, and `inputOption` are passed to the question without any override.
+quaire.getActiveQuestion().progress; // 50
+quaire.getNavigation()[0].color; // 'blue'
+quaire.getNavigation()[0].question.unit; // '%'
+```
 
 See [data.ts](./data.ts) for the data and [extending-data-definition.spec.ts](./extending-data-definition.spec.ts) for the behavior step by step.
