@@ -8,9 +8,9 @@ export type QuairePartialResult<Result extends object = QuaireResult> = {
 };
 
 export type QuaireBase<
+  Result extends object = QuaireResult,
   Question extends QuaireQuestion = QuaireQuestion,
   NavigationItem extends QuaireNavigationItem = QuaireNavigationItem,
-  Result extends object = QuaireResult,
 > = {
   saveAnswer(answer: unknown): void;
   getActiveQuestion(): Question | null;
@@ -23,9 +23,9 @@ export type QuaireBase<
 };
 
 export type QuaireOptions<
+  Result extends object = QuaireResult,
   Item extends QuaireItem = QuaireItem,
   NavigationItem extends QuaireNavigationItem = QuaireNavigationItem,
-  Result extends object = QuaireResult,
 > = {
   items: Array<Item>;
   navigationItems?: Array<NavigationItem>;

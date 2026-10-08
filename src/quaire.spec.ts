@@ -1,11 +1,4 @@
-import {
-  Quaire,
-  QuaireComponentType,
-  QuaireItem,
-  QuaireNavigationItem,
-  QuairePartialResult,
-  QuaireQuestion,
-} from './index';
+import { Quaire, QuaireComponentType, QuaireItem, QuaireNavigationItem, QuairePartialResult } from './index';
 
 describe('Quaire', () => {
   const items: Array<QuaireItem> = [
@@ -331,7 +324,7 @@ describe('Quaire', () => {
     }
 
     test('should type the result with a custom result type', () => {
-      const Q = new Quaire<QuaireItem, QuaireQuestion, QuaireNavigationItem, MyResult>({
+      const Q = new Quaire<MyResult>({
         items,
         result: { foo: 'option 1' },
       });
@@ -343,6 +336,12 @@ describe('Quaire', () => {
       expectTypeOf(result.foo).toEqualTypeOf<string | null | undefined>();
       expectTypeOf(result.bar).toEqualTypeOf<Array<number> | null | undefined>();
       expect(result).toEqual({ foo: 'option 1', bar: [20, 50] });
+    });
+
+    test('should infer the result type from the result option', () => {
+      const Q = new Quaire({ items, result: { foo: 'option 1' } });
+
+      expectTypeOf(Q.getResult()).toEqualTypeOf<{ foo?: string | null }>();
     });
 
     test('should use unknown values without a custom result type', () => {

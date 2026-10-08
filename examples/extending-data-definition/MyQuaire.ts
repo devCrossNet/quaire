@@ -6,6 +6,7 @@ import {
   QuaireNavigationItem,
   QuaireQuestion,
   QuaireRangeItemOption,
+  QuaireResult,
 } from '../../src';
 
 export type MyRangeItemOption = QuaireRangeItemOption & {
@@ -28,7 +29,7 @@ export type MyNavigationItem = QuaireNavigationItem & {
   unit?: string;
 };
 
-export class MyQuaire extends Quaire<MyItem, MyQuestion, MyNavigationItem> {
+export class MyQuaire extends Quaire<QuaireResult, MyItem, MyQuestion, MyNavigationItem> {
   protected _getQuestionObject(
     item: MyItem,
     dependsOnKeys: string[],

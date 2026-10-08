@@ -5,7 +5,7 @@ This example adds custom properties to the data, for example to show a progress 
 - `MyItem` adds `progress` to the questions and `divisor` and `unit` to `rangeOption`.
 - `MyQuestion` and `MyNavigationItem` add the same properties to the output.
 
-[MyQuaire.ts](./MyQuaire.ts) passes the types as type parameters (`Quaire<MyItem, MyQuestion, MyNavigationItem>`)
+[MyQuaire.ts](./MyQuaire.ts) passes the types as type parameters (`Quaire<QuaireResult, MyItem, MyQuestion, MyNavigationItem>`)
 and overrides two protected methods to copy the properties:
 
 - `_getQuestionObject`: adds `progress` to the active question
